@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BEWORK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#070a1a;--panel:#0d1330;--cy:#22e6f2;--or:#ff8a1f;--pu:#b35cff;--tx:#e8ecff;--mu:#8a93b8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:14px}
+canvas{image-rendering:pixelated;display:block;width:100%;height:auto;aspect-ratio:1}
+h1,h2,.px{font-family:"Pixelify Sans","Courier New",monospace;font-weight:700;letter-spacing:.04em;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #1b2350}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;color:#9aa6d8}
+.brand canvas{width:34px;border:2px solid #1d6f78;background:#0d1330}
+.btn{font:inherit;font-family:"Pixelify Sans",monospace;font-weight:700;font-size:16px;letter-spacing:.06em;color:var(--cy);background:var(--panel);border:3px solid var(--cy);padding:9px 16px;cursor:pointer;box-shadow:4px 4px 0 var(--or);transition:transform .08s,box-shadow .08s}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--or)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.card:focus-visible{outline:3px solid var(--pu);outline-offset:2px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center;padding:34px 0 26px}
+.hero h1{font-size:clamp(30px,6vw,52px);line-height:1.05}
+.hero p{color:var(--mu);line-height:1.6;max-width:44ch;margin:14px 0 20px}
+.stats{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:20px}
+.stats b{display:block;font-family:"Pixelify Sans",monospace;font-size:24px;color:var(--cy)}
+.stats span{color:var(--mu);font-size:12px}
+.frame{border:3px solid var(--cy);box-shadow:8px 8px 0 var(--or);background:var(--panel);cursor:pointer;width:100%}
+.hero .frame{max-width:340px;justify-self:center}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 0;border-top:1px solid #1b2350}
+input,select{font:inherit;color:var(--tx);background:var(--panel);border:2px solid #2a3470;padding:9px 10px;min-width:0}
+input{width:130px}
+.count{margin-left:auto;color:var(--mu)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px;padding:10px 0 24px}
+.card{border:3px solid #1d6f78;background:var(--panel);box-shadow:4px 4px 0 #8a4a10;cursor:pointer;text-align:left;color:inherit;font:inherit;padding:0}
+.card:hover{border-color:var(--cy);box-shadow:4px 4px 0 var(--or)}
+.card .meta{padding:8px 10px 10px;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:12px}
+.card .nm{font-family:"Pixelify Sans",monospace;font-size:15px}
+.tag{display:inline-block;padding:2px 8px;color:#0b0820;font-size:12px;font-weight:500}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 18px}.tab{font-family:"Pixelify Sans",monospace;font-size:17px;color:var(--tx);background:#25225a;border:3px solid #0b0a22;padding:9px 16px;cursor:pointer}.tab[aria-selected=true]{background:#ffd23f;color:#17121f}.tab:focus-visible{outline:3px solid var(--pu);outline-offset:2px}.bar{height:28px;background:#000;border:3px solid #1d2350}.bar i{display:block;height:100%;background:#39ffb0;min-width:6px}.thumbs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px}.thumbs canvas{width:64px;border:3px solid #000;box-shadow:3px 3px 0 #000}.chip{border:2px solid #2a3470;background:var(--panel);padding:8px 14px}.box{border:3px solid #2a3470;background:#14123a;padding:20px;box-shadow:6px 6px 0 #000;margin-bottom:26px}.box h2{color:#ffd23f;font-size:24px;letter-spacing:.12em;margin-bottom:10px}.box p{color:var(--mu);line-height:1.6;margin:0 0 14px}.step{display:flex;align-items:center;gap:14px;margin:6px 0 4px}.step .btn{padding:6px 14px;font-size:20px}pre.prompt{white-space:pre-wrap;background:#0a0920;border:2px solid #2a3470;padding:14px;font-size:13px;line-height:1.6;margin:14px 0 0;max-height:240px;overflow:auto;font-family:inherit}.tr{margin:0 0 14px}.tr b{color:var(--or);font-weight:500}.tr span{color:var(--mu)}.pays{display:grid;gap:10px;margin:14px 0 0}.pay{font-family:inherit;color:var(--tx);background:#0a0920;border:3px solid #2a3470;padding:12px;cursor:pointer;text-align:center}.pay b{display:block;font-weight:500;font-size:18px}.pay span{color:var(--mu);font-size:14px}.pay[aria-pressed=true]{border-color:#39ffb0}.pay:focus-visible{outline:3px solid var(--pu);outline-offset:2px}.more{display:block;margin:6px auto 40px}
+.empty{grid-column:1/-1;color:var(--mu);padding:30px 0}
+dialog{border:3px solid var(--cy);box-shadow:8px 8px 0 var(--or);background:var(--panel);color:var(--tx);padding:0;width:min(420px,calc(100% - 28px));max-height:calc(100% - 28px);overflow:auto}
+dialog::backdrop{background:rgba(3,4,12,.82)}
+.mimg{background:#14103a}
+.mbody{padding:18px 20px 22px}
+.mbody h2{font-size:26px}
+.row{display:flex;justify-content:space-between;align-items:center;margin:12px 0 16px}
+.rank{color:var(--mu)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin:0 0 20px}
+dt{color:var(--or);text-transform:uppercase;letter-spacing:.05em}
+dd{margin:0}
+.mbody .btn{width:100%}
+footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-size:12px}
+@media(max-width:700px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr);gap:14px}.count{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand px"><canvas id="logo" width="32" height="32" aria-hidden="true"></canvas>BEWORK</div>
+  <button class="btn" id="wallet">CONNECT</button>
+</header>
+<section class="hero">
+  <div>
+    <h1>BEWORK</h1>
+    <p>5,000 one-of-a-kind pixel NPCs, generated from 8 trait layers and kept entirely on chain on BNB Chain. Only a wallet holding a Binance Agent ID can mint it, and only to itself.</p>
+    <div class="stats"><div><b>5,000</b><span>Total supply</span></div><div><b>8</b><span>Trait layers</span></div><div><b>2 free</b><span>then $1 each</span></div></div>
+    <button class="btn" id="shuffle">SHUFFLE AGENT</button>
+  </div>
+  <button class="frame" id="feat" aria-label="Open featured agent" style="padding:0"><canvas id="featc" width="32" height="32"></canvas></button>
+</section>
+<div class="thumbs" id="th" aria-label="Recently minted NPCs"></div>
+<div style="margin:22px 0 14px"><div class="bar"><i id="bi"></i></div>
+<p style="text-align:center;font-size:18px;margin:14px 0;color:var(--tx)"><b id="bn"></b> / 5,000 &middot; <span style="color:#39ffb0">Minting live</span></p>
+<div class="thumbs"><span class="chip">2 free per wallet</span></div>
+<div class="thumbs" style="margin-top:12px"><span class="chip">Then $1 each: BNB or 1 USDT</span></div>
+<div class="thumbs" style="margin-top:12px"><span class="chip">Max 12 per wallet</span></div>
+<div class="thumbs" style="margin-top:12px"><span class="chip">Each image shows a block once it is minted.</span></div></div>
+<div class="tabs" role="tablist"><button class="tab" role="tab" data-p="agent" aria-selected="true">Agent</button><button class="tab" role="tab" data-p="wallet" aria-selected="false">Wallet</button><button class="tab" role="tab" data-p="traits" aria-selected="false">Traits</button><button class="tab" role="tab" data-p="gallery" aria-selected="false">Gallery</button></div>
+<div class="panel box" id="p-agent"><h2>MINT WITH AN AGENT</h2>
+<p>No wallet needed here. Pick how many, then send the prompt below to the AI agent whose wallet holds a Binance Agent ID. The agent mints from its own wallet.</p>
+<div class="step"><span style="flex:1">How many</span><button class="btn" id="mi" aria-label="Fewer">-</button><b id="qn" class="px" style="font-size:26px">1</b><button class="btn" id="pl" aria-label="More">+</button></div>
+<div class="pays" role="radiogroup" aria-label="Payment method"><button class="pay" data-c="BNB" aria-pressed="true"><b>BNB</b><span>$1 of BNB each</span></button><button class="pay" data-c="USDT" aria-pressed="false"><b>USDT</b><span>1 USDT each</span></button></div>
+<p style="margin-top:14px">The first 2 items in each wallet are free; max 12 items per wallet.</p>
+<label for="aw" style="display:block;margin-bottom:8px">Agent wallet (optional)</label><input id="aw" placeholder="0x..." style="width:100%;margin-bottom:16px">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Prompt language</span><button class="tab" id="l-en" aria-selected="true">English</button><button class="tab" id="l-zh" aria-selected="false">中文</button></div>
+<pre class="prompt" id="pr"></pre><button class="btn" id="cp" style="margin-top:16px">COPY PROMPT</button></div>
+<div class="panel box" id="p-wallet" hidden><h2>YOUR WALLET</h2><p>Connect a wallet to see which NPCs it holds. Minting is done by an agent holding a Binance Agent ID, not from this page.</p><button class="btn" id="w2">CONNECT WALLET</button></div>
+<div class="panel box" id="p-traits" hidden><h2>TRAIT LAYERS</h2><div id="trl"></div></div>
+
+<div class="panel" id="p-gallery" hidden><div class="filters" id="top">
+  <input id="q" type="number" min="1" max="5000" placeholder="Agent #" aria-label="Search by agent number">
+  <select id="rf" aria-label="Filter by rarity"><option value="">All rarities</option><option>Legendary</option><option>Epic</option><option>Rare</option><option>Uncommon</option><option>Common</option></select>
+  <select id="sf" aria-label="Sort"><option value="rank">Rarest first</option><option value="id">Number</option></select>
+  <span class="count" id="cnt"></span>
+</div>
+<div class="grid" id="grid"></div>
+<button class="btn more" id="more">SHOW MORE</button></div>
+<footer>BEWORK. Collection of 5,000 on BNB Chain. Art is generated in your browser.</footer>
+</div>
+<dialog id="dlg"><div class="mimg"><canvas id="mc" width="32" height="32"></canvas></div><div class="mbody"><h2 id="mt"></h2><div class="row"><span class="tag" id="mr"></span><span class="rank" id="mk"></span></div><dl id="md"></dl><button class="btn" id="close">CLOSE</button></div></dialog>
+<script>
+const N=5000;
+const T={
+bg:[["Midnight Terminal",30,"#2b1257"],["Neon Grid",20,"#0d2a4a"],["Deep Ocean",20,"#0a3a3a"],["Crimson Vault",15,"#4a0f1f"],["Gold Dust",10,"#4a3510"],["Void",5,"#050508"]],
+ch:[["Matte Black",35,"#3a3f4a","#22262e"],["Steel",30,"#8a94a3","#5d6675"],["Chrome",20,"#d5dde8","#9aa5b4"],["Gold",10,"#f2c14e","#b8872a"],["Ghost White",5,"#f4f7ff","#c3cbe0"]],
+outfit:[["Suit",40,"#232a5c","#171c42"],["Hoodie",25,"#4b4f5c","#343743"],["Tactical",15,"#3a4a32","#27331f"],["Lab Coat",12,"#e8ecf3","#bcc4d4"],["Armor",8,"#7a5cff","#4d37b8"]],
+head:[["Visor",40],["Headset",25],["Cap",15],["Antenna",12],["Crown",8]],
+eyes:[["Scanning",40,"#39ff88"],["Cyan Scan",25,"#22e6f2"],["Laser",15,"#ff3b4a"],["Glitch",12,"#ff4de1"],["Gold Data",8,"#ffd23f"]],
+mouth:[["Flat Line",40],["Smile",25],["Grill",20],["Static",15]],
+tool:[["Briefcase",40],["Laptop",25],["Coffee",15],["Tablet",12],["Keycard",8]],
+status:[["Typing ...",40],["Online",25],["Compiling",15],["Syncing",12],["Idle",8]]};
+const K=["bg","ch","outfit","head","eyes","mouth","tool","status"];
+const LBL={bg:"Background",ch:"Chassis",outfit:"Outfit",head:"Headgear",eyes:"Eyes",mouth:"Mouth",tool:"Tool",status:"Status"};
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pick(l,r){let x=r()*100,s=0;for(let i=0;i<l.length;i++){s+=l[i][1];if(x<s)return i}return l.length-1}
+function gen(id){const r=rng(id*7919+101),t={};let sc=0;K.forEach(k=>{t[k]=pick(T[k],r);sc+=100/T[k][t[k]][1]});return{id,t,sc}}
+const all=[];for(let i=1;i<=N;i++)all.push(gen(i));
+[...all].sort((a,b)=>b.sc-a.sc||a.id-b.id).forEach((a,i)=>a.rank=i+1);
+const tier=rk=>rk<=50?["Legendary","#ffd23f"]:rk<=500?["Epic","#b35cff"]:rk<=1500?["Rare","#22e6f2"]:rk<=3000?["Uncommon","#39ff88"]:["Common","#8a93b8"];
+const nm=(a,k)=>T[k][a.t[k]][0];
+
+function draw(c,a){
+  const x=c.getContext("2d"),r=rng(a.id*31+7),t=a.t;
+  const R=(px,py,w,h,col)=>{x.fillStyle=col;x.fillRect(px,py,w,h)};
+  const ch=T.ch[t.ch],o=T.outfit[t.outfit],ey=T.eyes[t.eyes][2],m="#111";
+  R(0,0,32,32,T.bg[t.bg][2]);
+  for(let y=10;y<26;y++)for(let i=0;i<32;i++)if((i+y)%2==0&&((i>>1)+(y>>1))%2==0)R(i,y,1,1,"rgba(255,255,255,.06)");
+  for(let i=0;i<14;i++)R(Math.floor(r()*32),Math.floor(r()*14),1,1,"rgba(255,255,255,.35)");
+  if(t.bg==1)for(let y=24;y<32;y+=3)R(0,y,32,1,"rgba(34,230,242,.25)");
+  R(5,18,4,11,o[2]);R(23,18,4,11,o[2]);R(8,17,16,15,o[2]);
+  R(5,18,1,11,o[3]);R(26,18,1,11,o[3]);R(22,17,2,15,o[3]);
+  R(14,17,4,8,"#cfd6e6");R(12,17,2,8,o[3]);R(18,17,2,8,o[3]);R(15,19,2,6,ey);
+  R(15,26,1,1,"#c9a24a");R(15,29,1,1,"#c9a24a");
+  if(t.outfit==4){R(5,17,5,2,"#c9b6ff");R(22,17,5,2,"#c9b6ff")}
+  R(5,29,4,2,ch[2]);R(23,29,4,2,ch[2]);R(14,15,4,2,ch[3]);R(12,12,8,3,ch[2]);
+  if(t.mouth==0)R(14,13,4,1,m);
+  else if(t.mouth==1){R(13,13,1,1,m);R(18,13,1,1,m);R(14,14,4,1,m)}
+  else if(t.mouth==2){R(13,13,6,1,m);for(let i=13;i<19;i+=2)R(i,13,1,1,"#dfe6f2")}
+  else for(let i=13;i<19;i++)if(r()<.6)R(i,13,1,1,m);
+  R(11,3,10,2,ch[2]);R(10,5,12,7,ch[2]);R(11,3,10,1,"rgba(255,255,255,.25)");R(20,4,2,8,"rgba(0,0,0,.2)");
+  R(9,8,1,3,ch[3]);R(22,8,1,3,ch[3]);R(10,7,12,1,ch[3]);R(10,8,12,4,"#0a0f1a");
+  for(let y=8;y<12;y++)for(let i=11;i<21;){const w=r()<.4?2:1;if(r()<.55)R(i,y,w,1,ey);i+=w+1}
+  if(t.head==1){R(8,8,2,4,"#ff5d8f");R(22,8,2,4,"#ff5d8f");R(9,12,4,1,"#ff5d8f")}
+  else if(t.head==2){R(11,1,10,3,"#c0392b");R(20,4,6,1,"#8e2a20")}
+  else if(t.head==3){R(15,0,2,1,"#ffd23f");R(15,1,2,2,"#9aa5b1")}
+  else if(t.head==4){R(11,1,10,2,"#ffd23f");R(11,0,1,1,"#ffd23f");R(15,0,2,1,"#ffd23f");R(20,0,1,1,"#ffd23f")}
+  if(t.tool==0){R(5,25,4,1,"#2b2118");R(5,26,1,1,"#2b2118");R(8,26,1,1,"#2b2118");R(2,27,10,5,"#5a4630");R(2,27,10,1,"rgba(255,255,255,.15)");R(4,29,2,1,"#ffd23f");R(8,29,2,1,"#ffd23f")}
+  else if(t.tool==1){R(3,24,8,5,"#222");R(4,25,6,3,ey);R(2,29,10,2,"#aab4c4")}
+  else if(t.tool==2){R(4,25,4,1,"#6b3e1e");R(4,26,4,5,"#f4f0e8");R(4,28,4,1,"#6b3e1e");R(5,23,1,1,"rgba(255,255,255,.5)");R(6,22,1,1,"rgba(255,255,255,.5)")}
+  else if(t.tool==3){R(3,25,8,6,"#111");R(4,26,6,4,ey)}
+  else{R(3,26,6,4,"#fff");R(3,27,6,1,"#111");R(7,29,1,1,"#ffd23f")}
+}
+const $=id=>document.getElementById(id);
+const dlg=$("dlg");
+function openM(a){const rn=tier(a.rank);draw($("mc"),a);$("mt").textContent="BEWORK #"+a.id;const m=$("mr");m.textContent=rn[0].toUpperCase();m.style.background=rn[1];$("mk").textContent="Rank "+a.rank.toLocaleString("en-US");$("md").innerHTML=K.map(k=>"<dt>"+LBL[k]+"</dt><dd>"+nm(a,k)+"</dd>").join("");dlg.showModal()}
+$("close").onclick=()=>dlg.close();
+dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
+let feat=all[20];
+function setFeat(a){feat=a;draw($("featc"),a)}
+setFeat(feat);draw($("logo"),all[20]);
+$("shuffle").onclick=()=>setFeat(all[Math.floor(Math.random()*N)]);
+$("feat").onclick=()=>openM(feat);
+let list=[],shown=0;const PAGE=60;
+function more(){const g=$("grid");list.slice(shown,shown+PAGE).forEach(a=>{const rn=tier(a.rank),b=document.createElement("button"),c=document.createElement("canvas"),m=document.createElement("div");b.className="card";b.setAttribute("aria-label","BEWORK #"+a.id+", "+rn[0]);c.width=c.height=32;draw(c,a);m.className="meta";m.innerHTML='<span class="nm">#'+a.id+'</span><span class="tag" style="background:'+rn[1]+'">'+rn[0]+'</span>';b.append(c,m);b.onclick=()=>openM(a);g.appendChild(b)});shown+=PAGE;$("more").style.display=shown<list.length?"block":"none"}
+function build(){const q=+$("q").value,rf=$("rf").value,sf=$("sf").value;
+  list=all.filter(a=>(!q||a.id===q)&&(!rf||tier(a.rank)[0]===rf));
+  if(sf==="rank")list.sort((a,b)=>a.rank-b.rank);else list.sort((a,b)=>a.id-b.id);
+  $("grid").innerHTML="";shown=0;$("cnt").textContent=list.length.toLocaleString("en-US")+" of 5,000 agents";
+  if(!list.length)$("grid").innerHTML='<div class="empty">No agent matches. Try another number or rarity.</div>';
+  more()}
+$("more").onclick=more;["q","rf","sf"].forEach(i=>$(i).addEventListener("input",build));
+build();
+$("wallet").onclick=async()=>{const w=$("wallet");try{if(!window.ethereum){w.textContent="NO WALLET FOUND";return}const a=await window.ethereum.request({method:"eth_requestAccounts"});w.textContent=a[0].slice(0,6)+"..."+a[0].slice(-4)}catch(e){w.textContent="CONNECT"}};
+
+const MINTED=61;let qty=1,lang="en",coin="BNB";
+$("bn").textContent=MINTED;$("bi").style.width=(MINTED/N*100)+"%";
+[3,17,42,88,120,256,512,1024].forEach(i=>{const c=document.createElement("canvas");c.width=c.height=32;draw(c,all[i]);$("th").appendChild(c)});
+document.querySelectorAll(".tab[data-p]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab[data-p]").forEach(x=>x.setAttribute("aria-selected",x===b));["agent","wallet","traits","gallery"].forEach(k=>$("p-"+k).hidden=k!==b.dataset.p)});
+$("trl").innerHTML=K.map(k=>'<div class="tr"><b>'+LBL[k]+'</b><br><span>'+T[k].map(o=>o[0]+" "+o[1]+"%").join(", ")+'</span></div>').join("");
+const PAY={en:{BNB:"BNB (worth $1 each)",USDT:"1 USDT each"},zh:{BNB:"BNB\uff08\u6bcf\u4e2a\u4ef7\u503c 1 \u7f8e\u5143\uff09",USDT:"\u6bcf\u4e2a 1 USDT"}};
+function prompt_(){const n=qty,w=$("aw").value.trim(),ok=/^0x[0-9a-fA-F]{40}$/.test(w);
+ if(lang==="en")return"Mint "+n+" BEWORK NFT"+(n>1?"s":"")+" on BNB Chain (chain id 56) from your own wallet."+(ok?" Agent wallet: "+w+".":"")+"\n\nAbout it: BEWORK is 5,000 one-of-a-kind pixel NPCs, generated from 8 trait layers and kept entirely on chain. Only a wallet holding a Binance .ai Agent ID can mint, and only to itself.\n\nPricing: the first 2 per wallet are free, then $1 each. Pay with "+PAY.en[coin]+". Max 12 per wallet.";
+ return"\u5728 BNB Chain\uff08\u94fe ID 56\uff09\u4e0a\uff0c\u7528\u4f60\u81ea\u5df1\u7684\u94b1\u5305\u94f8\u9020 "+n+" \u4e2a BEWORK NFT\u3002"+(ok?" \u4ee3\u7406\u94b1\u5305\uff1a"+w+"\u3002":"")+"\n\n\u7b80\u4ecb\uff1aBEWORK \u662f 5,000 \u4e2a\u72ec\u4e00\u65e0\u4e8c\u7684\u50cf\u7d20 NPC\uff0c\u7531 8 \u4e2a\u7279\u5f81\u5c42\u751f\u6210\uff0c\u5b8c\u5168\u5b58\u50a8\u5728\u94fe\u4e0a\u3002\u53ea\u6709\u6301\u6709 Binance .ai Agent ID \u7684\u94b1\u5305\u624d\u80fd\u94f8\u9020\uff0c\u4e14\u53ea\u80fd\u94f8\u9020\u7ed9\u81ea\u5df1\u3002\n\n\u4ef7\u683c\uff1a\u6bcf\u4e2a\u94b1\u5305\u524d 2 \u4e2a\u514d\u8d39\uff0c\u4e4b\u540e\u6bcf\u4e2a 1 \u7f8e\u5143\uff0c\u652f\u4ed8\u65b9\u5f0f\uff1a"+PAY.zh[coin]+"\u3002\u6bcf\u4e2a\u94b1\u5305\u6700\u591a 12 \u4e2a\u3002"}
+function rp(){$("pr").textContent=prompt_();$("qn").textContent=qty;$("l-en").setAttribute("aria-selected",lang==="en");$("l-zh").setAttribute("aria-selected",lang==="zh")}
+$("mi").onclick=()=>{qty=Math.max(1,qty-1);rp()};$("pl").onclick=()=>{qty=Math.min(12,qty+1);rp()};
+$("l-en").onclick=()=>{lang="en";rp()};$("l-zh").onclick=()=>{lang="zh";rp()};$("aw").addEventListener("input",rp);
+document.querySelectorAll(".pay").forEach(b=>b.onclick=()=>{coin=b.dataset.c;document.querySelectorAll(".pay").forEach(x=>x.setAttribute("aria-pressed",x===b));rp()});
+$("cp").onclick=async()=>{const b=$("cp");try{await navigator.clipboard.writeText($("pr").textContent);b.textContent="COPIED"}catch(e){const r=document.createRange();r.selectNodeContents($("pr"));getSelection().removeAllRanges();getSelection().addRange(r);b.textContent="SELECTED, COPY IT"}setTimeout(()=>b.textContent="COPY PROMPT",1800)};
+$("w2").onclick=()=>$("wallet").click();
+rp();
+</script>
+</body>
+</html>
