@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BEWORK · Setup Layer</title><link rel="icon" href="/favicon-32.png">
+<style>body{margin:0;background:#070a1a;color:#e8ecff;font-family:ui-monospace,Menlo,monospace;font-size:15px}
+.w{max-width:560px;margin:0 auto;padding:24px 16px}h1{color:#22e6f2;font-size:24px}
+button{width:100%;font:inherit;font-weight:700;font-size:17px;padding:14px;margin-top:12px;color:#070a1a;background:#22e6f2;border:0;cursor:pointer}
+button:disabled{opacity:.4}.l{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1b2350}
+.ok{color:#39ffb0}.er{color:#ff5d8f}.mu{color:#8a93b8}#log{margin-top:14px;white-space:pre-wrap;word-break:break-all}</style></head>
+<body><div class="w"><h1>BEWORK · Setup 8 Layer</h1>
+<p class="mu">Satu tombol. Wallet owner akan minta tanda tangan 8 kali (satu per layer). Trait dan bobot sama persis dengan gambar di bework.pro. Layer yang sudah terisi dilewati.</p>
+<div id="ls"></div><button id="go">HUBUNGKAN WALLET &amp; SIGN</button><div id="log" class="mu"></div></div>
+<script type="module">
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.min.js";
+const CA="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee",OWNER="0x134ae59CF20fbf006c6C65cdeCb06b0111922Ad7";
+const ABI=["function setLayer(uint256 i,string name,string[] traitNames,uint16[] weights)","function layer(uint256 i) view returns (string,string[],uint16[])","function owner() view returns (address)"];
+const T={
+bg:[["Midnight Terminal",30,"#2b1257"],["Neon Grid",20,"#0d2a4a"],["Deep Ocean",20,"#0a3a3a"],["Crimson Vault",15,"#4a0f1f"],["Gold Dust",10,"#4a3510"],["Void",5,"#050508"]],
+ch:[["Matte Black",35,"#3a3f4a","#22262e"],["Steel",30,"#8a94a3","#5d6675"],["Chrome",20,"#d5dde8","#9aa5b4"],["Gold",10,"#f2c14e","#b8872a"],["Ghost White",5,"#f4f7ff","#c3cbe0"]],
+outfit:[["Suit",40,"#232a5c","#171c42"],["Hoodie",25,"#4b4f5c","#343743"],["Tactical",15,"#3a4a32","#27331f"],["Lab Coat",12,"#e8ecf3","#bcc4d4"],["Armor",8,"#7a5cff","#4d37b8"]],
+head:[["Visor",40],["Headset",25],["Cap",15],["Antenna",12],["Crown",8]],
+eyes:[["Scanning",40,"#39ff88"],["Cyan Scan",25,"#22e6f2"],["Laser",15,"#ff3b4a"],["Glitch",12,"#ff4de1"],["Gold Data",8,"#ffd23f"]],
+mouth:[["Flat Line",40],["Smile",25],["Grill",20],["Static",15]],
+tool:[["Briefcase",40],["Laptop",25],["Coffee",15],["Tablet",12],["Keycard",8]],
+status:[["Typing ...",40],["Online",25],["Compiling",15],["Syncing",12],["Idle",8]]};
+const K=["bg","ch","outfit","head","eyes","mouth","tool","status"],L=["Background","Chassis","Outfit","Headgear","Eyes","Mouth","Tool","Status"];
+const $=id=>document.getElementById(id),log=(t,c="mu")=>{$("log").innerHTML+='<div class="'+c+'">'+t+'</div>'};
+const ro=new ethers.Contract(CA,ABI,new ethers.JsonRpcProvider("https://bsc-dataseed.bnbchain.org"));
+async function status(){const out=[];for(let i=0;i<8;i++){let n="";try{n=(await ro.layer(i))[0]}catch(e){}out.push(n)}
+ $("ls").innerHTML=out.map((n,i)=>'<div class="l"><span>'+i+'. '+L[i]+'</span><span class="'+(n?"ok":"mu")+'">'+(n?"terisi":"kosong")+'</span></div>').join("");return out}
+let done=await status();
+$("go").onclick=async()=>{const b=$("go");b.disabled=true;$("log").innerHTML="";
+ try{if(!window.ethereum)throw new Error("Wallet tidak ditemukan. Buka link ini di browser wallet (MetaMask, Trust, Binance Wallet).");
+  await ethereum.request({method:"eth_requestAccounts"});
+  try{await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x38"}]})}catch(e){if(e.code===4902)await ethereum.request({method:"wallet_addEthereumChain",params:[{chainId:"0x38",chainName:"BNB Smart Chain",nativeCurrency:{name:"BNB",symbol:"BNB",decimals:18},rpcUrls:["https://bsc-dataseed.bnbchain.org"],blockExplorerUrls:["https://bscscan.com"]}]});else throw e}
+  const prov=new ethers.BrowserProvider(window.ethereum),signer=await prov.getSigner(),me=await signer.getAddress();
+  if(me.toLowerCase()!==OWNER.toLowerCase())throw new Error("Wallet ini "+me+", bukan owner kontrak ("+OWNER+"). Ganti ke wallet owner.");
+  const c=new ethers.Contract(CA,ABI,signer),gp=(await prov.getFeeData()).gasPrice;
+  for(let i=0;i<8;i++){if(done[i]){log(i+". "+L[i]+": sudah terisi, dilewati");continue}
+   const t=T[K[i]];log(i+". "+L[i]+": tanda tangani di wallet…");
+   const tx=await c.setLayer(i,L[i],t.map(x=>x[0]),t.map(x=>x[1]),{gasPrice:gp});log("   dikirim "+tx.hash.slice(0,14)+"…");
+   await tx.wait();log("   ✓ selesai","ok");done=await status()}
+  log("Semua 8 layer sudah terpasang di kontrak.","ok")
+ }catch(e){log(e.shortMessage||e.message||String(e),"er")}finally{b.disabled=false}};
+</script></body></html>
