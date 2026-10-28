@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BEWORK</title>
+<meta name="description" content="5,000 one-of-a-kind pixel NPCs on BNB Chain. 2 free per wallet, then $1 each.">
+<meta name="theme-color" content="#070a1a">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BEWORK">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bework.pro/">
+<meta property="og:title" content="BEWORK">
+<meta property="og:description" content="5,000 one-of-a-kind pixel NPCs on BNB Chain. 2 free per wallet, then $1 each.">
+<meta property="og:image" content="https://bework.pro/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://bework.pro/og-image.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 :root{--bg:#070a1a;--panel:#0d1330;--cy:#22e6f2;--or:#ff8a1f;--pu:#b35cff;--tx:#e8ecff;--mu:#8a93b8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -57,7 +72,7 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 <div class="wrap">
 <header>
   <div class="brand px"><canvas id="logo" width="32" height="32" aria-hidden="true"></canvas>BEWORK</div>
-  <button class="btn" id="wallet">CONNECT</button>
+  <div style="display:flex;gap:10px"><button class="btn" id="inst" hidden>INSTALL APP</button><button class="btn" id="wallet">CONNECT</button></div>
 </header>
 <section class="hero">
   <div>
@@ -77,14 +92,17 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 <div class="thumbs" style="margin-top:12px"><span class="chip">Each image shows a block once it is minted.</span></div><div class="thumbs" style="margin-top:12px"><a class="chip" id="cal" target="_blank" rel="noopener" style="color:var(--tx);word-break:break-all">Contract: 0x78eD…caee</a></div></div>
 <div class="tabs" role="tablist"><button class="tab" role="tab" data-p="agent" aria-selected="true">Agent</button><button class="tab" role="tab" data-p="wallet" aria-selected="false">Wallet</button><button class="tab" role="tab" data-p="traits" aria-selected="false">Traits</button><button class="tab" role="tab" data-p="gallery" aria-selected="false">Gallery</button></div>
 <div class="panel box" id="p-agent"><h2>MINT WITH AN AGENT</h2>
-<p>No wallet needed here. Pick how many, then send the prompt below to the AI agent whose wallet holds a Binance Agent ID. The agent mints from its own wallet.</p>
+<p>Pick how many, then send the prompt below to the AI agent whose wallet holds a Binance Agent ID. The agent mints from its own wallet.</p>
 <div class="step"><span style="flex:1">How many</span><button class="btn" id="mi" aria-label="Fewer">-</button><b id="qn" class="px" style="font-size:26px">1</b><button class="btn" id="pl" aria-label="More">+</button></div>
 <div class="pays" role="radiogroup" aria-label="Payment method"><button class="pay" data-c="BNB" aria-pressed="true"><b>BNB</b><span>$1 of BNB each</span></button><button class="pay" data-c="USDT" aria-pressed="false"><b>USDT</b><span>1 USDT each</span></button></div>
 <p style="margin-top:14px">The first 2 items in each wallet are free; max 12 items per wallet.</p>
 <label for="aw" style="display:block;margin-bottom:8px">Agent wallet (optional)</label><input id="aw" placeholder="0x..." style="width:100%;margin-bottom:16px">
 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Prompt language</span><button class="tab" id="l-en" aria-selected="true">English</button><button class="tab" id="l-zh" aria-selected="false">中文</button></div>
-<pre class="prompt" id="pr"></pre><button class="btn" id="cp" style="margin-top:16px">COPY PROMPT</button></div>
-<div class="panel box" id="p-wallet" hidden><h2>YOUR WALLET</h2><p>Connect a wallet to see which NPCs it holds. Minting is done by an agent holding a Binance Agent ID, not from this page.</p><button class="btn" id="w2">CONNECT WALLET</button></div>
+<pre class="prompt" id="pr"></pre><button class="btn" id="cp" style="margin-top:16px">COPY PROMPT</button>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid #1b2350"><h2>OR MINT FROM THIS PAGE</h2>
+<p>If the wallet you connect holds a Binance Agent ID, mint here directly with the amount and coin chosen above. The page switches to BNB Chain for you.</p>
+<button class="btn" id="dm" style="width:100%">MINT NOW</button><p id="dms" style="margin-top:12px;color:var(--mu);word-break:break-word"></p></div></div>
+<div class="panel box" id="p-wallet" hidden><h2>YOUR WALLET</h2><p>Connect a wallet to see which NPCs it holds. Mint from the Agent tab, by prompt or directly if this wallet holds a Binance Agent ID.</p><button class="btn" id="w2">CONNECT WALLET</button></div>
 <div class="panel box" id="p-traits" hidden><h2>TRAIT LAYERS</h2><div id="trl"></div></div>
 
 <div class="panel" id="p-gallery" hidden><div class="filters" id="top">
@@ -206,6 +224,29 @@ $("wallet").onclick=async()=>{const w=$("wallet");try{if(!window.ethereum){w.tex
 $("w2").onclick=()=>$("wallet").click();
 const _openM=openM;openM=function(a){_openM(a);const md=$("md");if(a.id<=MINTED){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent="Minted at block";dd.textContent="…";md.append(dt,dd);call("0xa2f3144e"+pad(a.id)).then(r=>dd.textContent=word(r).toLocaleString("en-US")).catch(()=>dd.textContent="-")}else{const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent="Status";dd.textContent="Not minted yet";md.append(dt,dd)}};
 rp();
+
+const USDT="0x55d398326f99059fF775485246999027B3197955";
+async function ensureBsc(){const id=await ethereum.request({method:"eth_chainId"});if(id==="0x38")return;
+ try{await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x38"}]})}catch(e){if(e.code===4902)await ethereum.request({method:"wallet_addEthereumChain",params:[{chainId:"0x38",chainName:"BNB Smart Chain",nativeCurrency:{name:"BNB",symbol:"BNB",decimals:18},rpcUrls:["https://bsc-dataseed.bnbchain.org"],blockExplorerUrls:["https://bscscan.com"]}]});else throw e}}
+async function waitTx(h){for(let i=0;i<90;i++){await new Promise(r=>setTimeout(r,2000));try{const r=await fetch(RPCS[0],{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_getTransactionReceipt",params:[h]})});const j=await r.json();if(j.result)return j.result.status==="0x1"}catch(e){}}return null}
+async function rawCall(to,data){for(const u of RPCS){try{const r=await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to,data},"latest"]})});const j=await r.json();if(j.result)return j.result}catch(e){}}throw new Error("rpc")}
+$("dm").onclick=async()=>{const st=$("dms"),b=$("dm");const say=(t,c)=>{st.textContent=t;st.style.color=c||"var(--mu)"};
+ if(!window.ethereum){say("No wallet found. Open this page in a wallet app such as Binance Wallet, MetaMask, or Trust Wallet.","#ff5d8f");return}
+ b.disabled=true;try{const [me]=await ethereum.request({method:"eth_requestAccounts"});await ensureBsc();
+  const [h,m]=await Promise.all([call("0x4eab3ef2"+adr(me)),call("0x3cef28d2"+adr(me))]);
+  if(word(h)!==1n){say("This wallet has no Binance Agent ID, so the contract will not let it mint. Use the prompt with your agent instead.","#ff5d8f");return}
+  if(Number(word(m))+qty>12){say("That goes past 12 per wallet. This wallet has minted "+Number(word(m))+".","#ff5d8f");return}
+  const q=await call("0x8f79306e"+adr(me)+pad(qty));const bnb=word(q,1),usd=word(q,2);let tx;
+  if(coin==="USDT"&&usd>0n){const al=word(await rawCall(USDT,"0xdd62ed3e"+adr(me)+adr(CA)));
+   if(al<usd){say("Approve USDT in your wallet…");const ah=await ethereum.request({method:"eth_sendTransaction",params:[{from:me,to:USDT,data:"0x095ea7b3"+adr(CA)+pad(usd)}]});say("Waiting for approval…");if(!await waitTx(ah))throw new Error("USDT approval failed")}
+   say("Confirm the mint in your wallet…");tx=await ethereum.request({method:"eth_sendTransaction",params:[{from:me,to:CA,data:"0xc156bbbd"+pad(qty)}]})}
+  else{const val=bnb+bnb/100n;say("Confirm the mint in your wallet…");tx=await ethereum.request({method:"eth_sendTransaction",params:[{from:me,to:CA,data:"0xe8c812b5"+pad(qty),value:"0x"+val.toString(16)}]})}
+  say("Minting… "+tx.slice(0,10)+"…");const ok=await waitTx(tx);
+  if(ok){say("Minted! See it on BscScan: bscscan.com/tx/"+tx,"#39ffb0");live();showWallet(me)}else say("The mint did not go through. Check the transaction on BscScan: "+tx,"#ff5d8f")
+ }catch(e){say((e&&e.message)||"Cancelled.","#ff5d8f")}finally{b.disabled=false}};
+let dip=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;$("inst").hidden=false});
+$("inst").onclick=async()=>{if(!dip)return;dip.prompt();await dip.userChoice;dip=null;$("inst").hidden=true};
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 </script>
 </body>
 </html>

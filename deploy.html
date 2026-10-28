@@ -73,6 +73,7 @@
     <textarea id="lTraits" placeholder="Blue, Green, Gold"></textarea>
     <label>Bobot rarity (koma, sama jumlahnya; besar = umum)</label>
     <input id="lWeights" placeholder="60, 35, 5">
+    <button class="alt" id="btnPreset" type="button">Isi layer ini dari website (sama dengan gambar di bework.pro)</button>
     <button id="btnLayer" disabled>setLayer</button>
     <button class="alt" id="btnFreeze" disabled>freezeTraits (permanen)</button>
   </div>
@@ -216,6 +217,22 @@ $("btnRenderer").onclick = () => send("setRenderer", c=>c.setRenderer($("rendere
 $("btnOpen").onclick = () => send("Buka mint", c=>c.setMintOpen(true));
 $("btnClose").onclick = () => send("Tutup mint", c=>c.setMintOpen(false));
 $("btnWithdraw").onclick = () => send("withdraw", c=>c.withdraw($("wTo").value.trim()||me));
+
+// Preset 8 layer, sama persis dengan trait di bework.pro
+const SITE_T={
+bg:[["Midnight Terminal",30,"#2b1257"],["Neon Grid",20,"#0d2a4a"],["Deep Ocean",20,"#0a3a3a"],["Crimson Vault",15,"#4a0f1f"],["Gold Dust",10,"#4a3510"],["Void",5,"#050508"]],
+ch:[["Matte Black",35,"#3a3f4a","#22262e"],["Steel",30,"#8a94a3","#5d6675"],["Chrome",20,"#d5dde8","#9aa5b4"],["Gold",10,"#f2c14e","#b8872a"],["Ghost White",5,"#f4f7ff","#c3cbe0"]],
+outfit:[["Suit",40,"#232a5c","#171c42"],["Hoodie",25,"#4b4f5c","#343743"],["Tactical",15,"#3a4a32","#27331f"],["Lab Coat",12,"#e8ecf3","#bcc4d4"],["Armor",8,"#7a5cff","#4d37b8"]],
+head:[["Visor",40],["Headset",25],["Cap",15],["Antenna",12],["Crown",8]],
+eyes:[["Scanning",40,"#39ff88"],["Cyan Scan",25,"#22e6f2"],["Laser",15,"#ff3b4a"],["Glitch",12,"#ff4de1"],["Gold Data",8,"#ffd23f"]],
+mouth:[["Flat Line",40],["Smile",25],["Grill",20],["Static",15]],
+tool:[["Briefcase",40],["Laptop",25],["Coffee",15],["Tablet",12],["Keycard",8]],
+status:[["Typing ...",40],["Online",25],["Compiling",15],["Syncing",12],["Idle",8]]};
+const SITE_K=["bg","ch","outfit","head","eyes","mouth","tool","status"];
+const SITE_L=["Background","Chassis","Outfit","Headgear","Eyes","Mouth","Tool","Status"];
+function fillPreset(){const i=Math.min(7,Math.max(0,Number($("lIdx").value)||0)),L=SITE_T[SITE_K[i]];
+ $("lName").value=SITE_L[i];$("lTraits").value=L.map(x=>x[0]).join(", ");$("lWeights").value=L.map(x=>x[1]).join(", ")}
+$("btnPreset").onclick=fillPreset;$("lIdx").addEventListener("input",fillPreset);fillPreset();
 </script>
 </body>
 </html>
