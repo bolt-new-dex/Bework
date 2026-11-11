@@ -15,8 +15,11 @@
   h1 .hl{color:var(--cy)}
   .sub{color:var(--mu);line-height:1.6;max-width:62ch;margin:12px 0 22px}
   .box{border:3px solid #2a3470;background:#14123a;padding:20px;box-shadow:6px 6px 0 #000;margin:0 0 26px}
+  .box.hero{border-color:var(--cy);box-shadow:6px 6px 0 var(--or)}
   .box h2{font-family:"Pixelify Sans",monospace;color:#ffd23f;font-size:21px;letter-spacing:.12em;margin:0 0 10px}
   .box p{color:var(--mu);line-height:1.6;margin:0 0 14px}
+  .big{font-family:"Pixelify Sans",monospace;font-weight:700;font-size:clamp(28px,5vw,40px);color:var(--cy);margin:6px 0 2px;word-break:break-all}
+  .biglab{font-size:11px;color:var(--mu);letter-spacing:.05em;text-transform:uppercase}
   code{font-family:inherit;font-size:12.5px;color:#ffd23f;word-break:break-all}
   label{display:block;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
   input{width:100%;box-sizing:border-box;background:var(--panel);border:2px solid #2a3470;color:var(--tx);padding:9px 10px;font-size:13.5px;font-family:inherit;min-width:0}
@@ -27,9 +30,11 @@
   .btn:focus-visible{outline:3px solid var(--pu);outline-offset:2px}
   .btn.alt{color:var(--tx);border-color:#2a3470;box-shadow:4px 4px 0 #000}
   .btn.alt:hover{box-shadow:2px 2px 0 #000}
+  .btn.big-btn{font-size:20px;padding:13px 26px}
   .btn:disabled{opacity:.45;cursor:not-allowed}
   .small{font-size:12.5px;color:var(--mu);line-height:1.6}
   .status{font-size:13.5px;color:#39ffb0;min-height:18px;word-break:break-all;margin-top:10px}
+  pre.prompt{white-space:pre-wrap;background:#0a0920;border:2px solid #2a3470;padding:14px;font-size:13px;line-height:1.6;margin:14px 0 0;max-height:280px;overflow:auto;font-family:inherit;color:var(--tx)}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
   .cell{background:#0a0920;border:2px solid #2a3470;padding:10px 12px}
   .cell .k{font-size:11px;color:var(--mu);letter-spacing:.05em;text-transform:uppercase}
@@ -43,25 +48,38 @@
 </header>
 
 <h1>BEWORK <span class="hl">STAKING</span></h1>
-<p class="sub">Stake your BEWORK NFTs, earn WORK every hour, and claim straight into your wallet — the tokens arrive in the same claim transaction, with no manual processing.</p>
+<p class="sub">Stake your BEWORK NFTs, earn WORK every hour, and claim in one click — the tokens land in your wallet in the same transaction. Or let your AI agent claim for you with the prompt below.</p>
 
-<div class="box"><h2>CONTRACT SETTINGS</h2>
-<p>The staking and token addresses below are pre-filled from the official deployment — normally you never need to touch them. If you change them, the new values are saved in this browser. The BEWORK NFT contract is fixed.</p>
-<label>Staking contract address (BeworkStaking)</label>
-<input id="cfgStaking" value="0x61063e84831cb4a92a309b12661e1f70e2fbc339">
-<label>WORK token address</label>
-<input id="cfgToken" value="0x87f16afc6219e59e0ff2dd59653d98def41a629c">
-<label>BEWORK NFT contract (fixed)</label>
-<input id="cfgNft" value="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee" readonly>
-<p style="margin-top:14px"><button id="saveCfgBtn" class="btn alt">SAVE SETTINGS</button></p>
-<p class="status" id="cfgStatus"></p></div>
+<div class="box hero"><h2>CLAIM WORK</h2>
+<div class="biglab">Your claimable rewards</div>
+<div class="big" id="heroPending">—</div>
+<p id="heroNote">One click: the button connects your wallet if needed, attaches the 0.00022 BNB claim fee automatically, and sends the claim transaction. Minimum claim 10 WORK.</p>
+<p><button id="heroClaimBtn" class="btn big-btn">CLAIM WORK</button></p>
+<p class="status" id="heroStatus"></p></div>
 
-<div class="box"><h2>01 — CONNECT WALLET</h2>
-<p>Connect the wallet that holds your BEWORK NFTs. The page switches to BNB Smart Chain automatically.</p>
-<p><button id="connectBtn" class="btn">CONNECT WALLET</button></p>
-<p class="status" id="walletLine">Not connected.</p></div>
+<div class="box"><h2>OR CLAIM WITH YOUR AGENT</h2>
+<p>Same as minting: copy this prompt and send it to your AI agent. The agent claims from its own wallet — the wallet holding your staked NFTs — so the WORK lands there directly.</p>
+<pre class="prompt" id="agentPrompt"></pre>
+<p><button id="copyPromptBtn" class="btn">COPY PROMPT</button></p>
+<p class="status" id="promptStatus"></p></div>
 
-<div class="box"><h2>02 — MY PANEL</h2>
+<div class="box"><h2>STAKE NFTS</h2>
+<p>First time only: approve the staking contract to move your NFTs (one approval). Then enter the token IDs to stake, separated by commas — e.g. <code>12, 305, 1999</code>. Rewards start counting the moment an NFT is staked. The panel below shows your numbers; connect with the CLAIM WORK button above or the stake button and the page reads them automatically.</p>
+<p><button id="approveBtn" class="btn alt">APPROVE STAKING</button></p>
+<p class="status" id="approveStatus"></p>
+<label>Token IDs to stake</label>
+<input id="stakeIds" placeholder="e.g. 12, 305, 1999">
+<p><button id="stakeBtn" class="btn">STAKE NFTS</button></p>
+<p class="status" id="stakeStatus"></p></div>
+
+<div class="box"><h2>UNSTAKE NFTS</h2>
+<p>Take your NFTs back at any time — no fee, never locked. Rewards you already earned stay recorded and can be claimed afterwards.</p>
+<label>Token IDs to unstake</label>
+<input id="unstakeIds" placeholder="e.g. 12, 305">
+<p><button id="unstakeBtn" class="btn">UNSTAKE NFTS</button></p>
+<p class="status" id="unstakeStatus"></p></div>
+
+<div class="box"><h2>MY PANEL</h2>
 <div class="grid">
 <div class="cell"><div class="k">My WORK balance</div><div class="v" id="pWorkBal">—</div></div>
 <div class="cell"><div class="k">NFTs in my wallet</div><div class="v" id="pNftBal">—</div></div>
@@ -76,32 +94,24 @@
 <p><button id="refreshBtn" class="btn alt">REFRESH PANEL</button></p>
 <p class="status" id="panelStatus"></p></div>
 
-<div class="box"><h2>03 — STAKE NFTS</h2>
-<p>First time only: approve the staking contract to move your NFTs (one approval). Then enter the token IDs to stake, separated by commas — e.g. <code>12, 305, 1999</code>. Make sure the IDs belong to this wallet.</p>
-<p><button id="approveBtn" class="btn alt">APPROVE STAKING</button></p>
-<p class="status" id="approveStatus"></p>
-<label>Token IDs to stake</label>
-<input id="stakeIds" placeholder="e.g. 12, 305, 1999">
-<p><button id="stakeBtn" class="btn">STAKE NFTS</button></p>
-<p class="status" id="stakeStatus"></p></div>
-
-<div class="box"><h2>04 — UNSTAKE NFTS</h2>
-<p>Take your NFTs back at any time — no fee, never locked. Rewards you already earned stay recorded and can be claimed afterwards.</p>
-<label>Token IDs to unstake</label>
-<input id="unstakeIds" placeholder="e.g. 12, 305">
-<p><button id="unstakeBtn" class="btn">UNSTAKE NFTS</button></p>
-<p class="status" id="unstakeStatus"></p></div>
-
-<div class="box"><h2>05 — CLAIM WORK</h2>
-<p>Claiming sends WORK directly to your wallet in this very transaction. Each claim attaches a fee of <b style="color:var(--tx)">0.00022 BNB</b> (read live from the contract) and needs accrued rewards of at least the minimum claim shown in the panel.</p>
-<p><button id="claimBtn" class="btn">CLAIM WORK</button></p>
-<p class="status" id="claimStatus"></p></div>
+<div class="box"><h2>CONTRACT SETTINGS</h2>
+<p>The staking and token addresses below are pre-filled from the official deployment — normally you never need to touch them. If you change them, the new values are saved in this browser. The BEWORK NFT contract is fixed.</p>
+<label>Staking contract address (BeworkStaking)</label>
+<input id="cfgStaking" value="0x61063e84831cb4a92a309b12661e1f70e2fbc339">
+<label>WORK token address</label>
+<input id="cfgToken" value="0x87f16afc6219e59e0ff2dd59653d98def41a629c">
+<label>BEWORK NFT contract (fixed)</label>
+<input id="cfgNft" value="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee" readonly>
+<p style="margin-top:14px"><button id="saveCfgBtn" class="btn alt">SAVE SETTINGS</button></p>
+<p class="status" id="cfgStatus"></p></div>
 
 <footer>Staking runs through the BeworkStaking contract; the BEWORK NFT contract is unchanged.<br>Network: BNB Smart Chain (56) · Staking: 0x6106…c339 · WORK: 0x87f1…629c</footer>
 
 </div>
 <script>
 var NFT_DEFAULT = "0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee";
+var STAKING_DEFAULT = "0x61063e84831cb4a92a309b12661e1f70e2fbc339";
+var WORK_DEFAULT = "0x87f16afc6219e59e0ff2dd59653d98def41a629c";
 var SEL_BALANCEOF = "0x70a08231", SEL_PENDING = "0xf40f0f52", SEL_STAKEDOF = "0xaf500ba3";
 var SEL_RATE = "0x69629025", SEL_FEE = "0x99d32fc4", SEL_MINCLAIM = "0xab937cc1", SEL_RESERVE = "0xa10954fe";
 var SEL_STAKE = "0x0fbf0a93", SEL_UNSTAKE = "0xe449f341", SEL_CLAIM = "0x4e71d92d";
@@ -159,9 +169,24 @@ function parseIds(str){
   }
   return ids.length > 0 ? ids : null;
 }
+async function ensureConnected(statusId){
+  var p = provider();
+  if (!p) { document.getElementById(statusId).textContent = "No wallet found — open this page in the OKX / MetaMask / Trust dApp browser."; return false; }
+  if (account) return true;
+  try {
+    var accs = await p.request({method:"eth_requestAccounts"});
+    account = accs[0];
+    try { await p.request({method:"wallet_switchEthereumChain", params:[{chainId:"0x38"}]}); }
+    catch (e) {
+      if (e && e.code === 4902) { await p.request({method:"wallet_addEthereumChain", params:[{chainId:"0x38", chainName:"BNB Smart Chain", nativeCurrency:{name:"BNB", symbol:"BNB", decimals:18}, rpcUrls:["https://bsc-dataseed.binance.org/"], blockExplorerUrls:["https://bscscan.com"]}]}); }
+      else throw e;
+    }
+    return true;
+  } catch (e) { document.getElementById(statusId).textContent = "Connection failed: " + (e && e.message ? e.message : e); return false; }
+}
 async function sendTx(to, data, valueHex, statusId){
   var p = provider();
-  if (!p || !account) { document.getElementById(statusId).textContent = "Connect your wallet first (step 01)."; return null; }
+  if (!p || !account) { document.getElementById(statusId).textContent = "Connect your wallet first."; return null; }
   try {
     var params = {from: account, to: to, data: data};
     if (valueHex) params.value = valueHex;
@@ -180,32 +205,62 @@ async function sendTx(to, data, valueHex, statusId){
     return h;
   } catch (e) { document.getElementById(statusId).textContent = "Failed: " + (e && e.message ? e.message : e); return null; }
 }
+function buildAgentPrompt(){
+  var lines = [
+    "Claim my BEWORK staking rewards on BNB Smart Chain (chainId 56).",
+    "",
+    "1. Read pendingReward(" + (account || "<my wallet address>") + ") on the BeworkStaking contract " + STAKING_DEFAULT + " (function selector 0xf40f0f52).",
+    "2. If the result is below 10 WORK (10000000000000000000 wei), do not claim — report how much has accrued so far and stop.",
+    "3. Otherwise call claim() (selector 0x4e71d92d) on " + STAKING_DEFAULT + " and attach exactly 0.00022 BNB (220000000000000 wei) as the transaction value — that is the claim fee.",
+    "4. The claimed WORK (token " + WORK_DEFAULT + ") is transferred to my wallet in the same transaction. My BEWORK NFTs are already staked in that contract.",
+    "5. Report the transaction hash and the amount of WORK received."
+  ];
+  document.getElementById("agentPrompt").textContent = lines.join("\n");
+}
+document.getElementById("copyPromptBtn").onclick = function(){
+  var txt = document.getElementById("agentPrompt").textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ document.getElementById("promptStatus").textContent = "Prompt copied — send it to your AI agent."; });
+};
+async function refreshHero(){
+  var s = stakingAddr();
+  if (!account || !validAddr(s)) { document.getElementById("heroPending").textContent = "—"; return; }
+  try {
+    var pend = BigInt(await callRead(s, SEL_PENDING + encodeAddr(account)));
+    document.getElementById("heroPending").textContent = fmtWork(pend);
+    document.getElementById("pPending").textContent = fmtWork(pend);
+  } catch (e) {}
+}
+document.getElementById("heroClaimBtn").onclick = async function(){
+  var okc = await ensureConnected("heroStatus");
+  if (!okc) return;
+  buildAgentPrompt();
+  var s = stakingAddr();
+  if (!validAddr(s)) { document.getElementById("heroStatus").textContent = "Invalid staking contract address (see Contract settings at the bottom)."; return; }
+  try {
+    var fee = BigInt(await callRead(s, SEL_FEE));
+    var minC = BigInt(await callRead(s, SEL_MINCLAIM));
+    var pend = BigInt(await callRead(s, SEL_PENDING + encodeAddr(account)));
+    document.getElementById("heroPending").textContent = fmtWork(pend);
+    if (pend < minC) {
+      document.getElementById("heroStatus").textContent = "You have accrued " + fmtWork(pend) + " — the minimum claim is " + fmtWork(minC) + ". Stake an NFT below, or wait for more rewards to build up (10 WORK per hour per staked NFT).";
+      refreshPanel();
+      return;
+    }
+    var h = await sendTx(s, SEL_CLAIM, "0x" + fee.toString(16), "heroStatus");
+    if (h) { document.getElementById("heroStatus").textContent = "WORK sent straight to your wallet: " + h; refreshPanel(); refreshHero(); }
+  } catch (e) { document.getElementById("heroStatus").textContent = "Failed: " + (e && e.message ? e.message : e); }
+};
 document.getElementById("saveCfgBtn").onclick = function(){
   var s = stakingAddr(), t = tokenAddr();
   if (!validAddr(s)) { document.getElementById("cfgStatus").textContent = "Invalid staking contract address."; return; }
   if (!validAddr(t)) { document.getElementById("cfgStatus").textContent = "Invalid WORK token address."; return; }
   try { localStorage.setItem("bework_staking", s); localStorage.setItem("bework_token", t); } catch (e) {}
   document.getElementById("cfgStatus").textContent = "Settings saved.";
-  refreshPanel();
-};
-document.getElementById("connectBtn").onclick = async function(){
-  var p = provider();
-  if (!p) { document.getElementById("walletLine").textContent = "No wallet found — open this page in the OKX / MetaMask / Trust dApp browser."; return; }
-  try {
-    var accs = await p.request({method:"eth_requestAccounts"});
-    account = accs[0];
-    try { await p.request({method:"wallet_switchEthereumChain", params:[{chainId:"0x38"}]}); }
-    catch (e) {
-      if (e && e.code === 4902) { await p.request({method:"wallet_addEthereumChain", params:[{chainId:"0x38", chainName:"BNB Smart Chain", nativeCurrency:{name:"BNB", symbol:"BNB", decimals:18}, rpcUrls:["https://bsc-dataseed.binance.org/"], blockExplorerUrls:["https://bscscan.com"]}]}); }
-      else throw e;
-    }
-    document.getElementById("walletLine").textContent = "Connected: " + account;
-    refreshPanel();
-  } catch (e) { document.getElementById("walletLine").textContent = "Connection failed: " + (e && e.message ? e.message : e); }
+  refreshPanel(); refreshHero();
 };
 async function refreshPanel(){
   var s = stakingAddr(), t = tokenAddr();
-  if (!validAddr(s) || !validAddr(t)) { document.getElementById("panelStatus").textContent = "Fill in and save the staking + token contract addresses first."; return; }
+  if (!validAddr(s) || !validAddr(t)) { document.getElementById("panelStatus").textContent = "Contract addresses are invalid — see Contract settings at the bottom."; return; }
   var p = provider();
   if (!p) { document.getElementById("panelStatus").textContent = "No wallet found."; return; }
   try {
@@ -226,16 +281,21 @@ async function refreshPanel(){
       document.getElementById("pNftBal").textContent = nbal.toString() + " NFT";
       document.getElementById("pStakedCount").textContent = ids.length.toString() + " NFT";
       document.getElementById("pPending").textContent = fmtWork(pend);
+      document.getElementById("heroPending").textContent = fmtWork(pend);
       document.getElementById("pStakedIds").textContent = ids.length ? ids.map(function(x){ return x.toString(); }).join(", ") : "(none)";
     }
     document.getElementById("panelStatus").textContent = "Panel refreshed from chain.";
   } catch (e) { document.getElementById("panelStatus").textContent = "Read failed: " + e.message + " (check the contract addresses)."; }
 }
-document.getElementById("refreshBtn").onclick = refreshPanel;
+document.getElementById("refreshBtn").onclick = async function(){
+  var okc = await ensureConnected("panelStatus");
+  if (okc) { buildAgentPrompt(); refreshPanel(); }
+};
 document.getElementById("approveBtn").onclick = async function(){
+  var okc = await ensureConnected("approveStatus");
+  if (!okc) return;
   var s = stakingAddr();
   if (!validAddr(s)) { document.getElementById("approveStatus").textContent = "Invalid staking contract address."; return; }
-  if (!account) { document.getElementById("approveStatus").textContent = "Connect your wallet first."; return; }
   try {
     var already = await callRead(NFT_DEFAULT, SEL_ISAPPROVED + encodeAddr(account) + encodeAddr(s));
     if (BigInt(already) === BigInt(1)) { document.getElementById("approveStatus").textContent = "Already approved — no need to approve again."; return; }
@@ -244,6 +304,9 @@ document.getElementById("approveBtn").onclick = async function(){
   if (h) document.getElementById("approveStatus").textContent = "Approval active: " + h;
 };
 document.getElementById("stakeBtn").onclick = async function(){
+  var okc = await ensureConnected("stakeStatus");
+  if (!okc) return;
+  buildAgentPrompt();
   var s = stakingAddr();
   if (!validAddr(s)) { document.getElementById("stakeStatus").textContent = "Invalid staking contract address."; return; }
   var ids = parseIds(document.getElementById("stakeIds").value);
@@ -258,28 +321,17 @@ document.getElementById("stakeBtn").onclick = async function(){
     } catch (e) { document.getElementById("stakeStatus").textContent = "Could not verify the owner of token " + ids[i].toString() + ": " + e.message; return; }
   }
   var h = await sendTx(s, SEL_STAKE + encodeIdArray(ids), null, "stakeStatus");
-  if (h) refreshPanel();
+  if (h) { refreshPanel(); refreshHero(); }
 };
 document.getElementById("unstakeBtn").onclick = async function(){
+  var okc = await ensureConnected("unstakeStatus");
+  if (!okc) return;
   var s = stakingAddr();
   if (!validAddr(s)) { document.getElementById("unstakeStatus").textContent = "Invalid staking contract address."; return; }
   var ids = parseIds(document.getElementById("unstakeIds").value);
   if (!ids) { document.getElementById("unstakeStatus").textContent = "Invalid IDs — enter token ID numbers separated by commas."; return; }
   var h = await sendTx(s, SEL_UNSTAKE + encodeIdArray(ids), null, "unstakeStatus");
-  if (h) refreshPanel();
-};
-document.getElementById("claimBtn").onclick = async function(){
-  var s = stakingAddr();
-  if (!validAddr(s)) { document.getElementById("claimStatus").textContent = "Invalid staking contract address."; return; }
-  try {
-    var fee = BigInt(await callRead(s, SEL_FEE));
-    var minC = BigInt(await callRead(s, SEL_MINCLAIM));
-    var pend = BigInt(await callRead(s, SEL_PENDING + encodeAddr(account)));
-    if (pend < minC) { document.getElementById("claimStatus").textContent = "Accrued rewards " + fmtWork(pend) + " — below the minimum claim of " + fmtWork(minC) + "."; return; }
-    var valueHex = "0x" + fee.toString(16);
-    var h = await sendTx(s, SEL_CLAIM, valueHex, "claimStatus");
-    if (h) { document.getElementById("claimStatus").textContent = "WORK sent to your wallet: " + h; refreshPanel(); }
-  } catch (e) { document.getElementById("claimStatus").textContent = "Failed: " + (e && e.message ? e.message : e); }
+  if (h) { refreshPanel(); refreshHero(); }
 };
 try {
   var sv = localStorage.getItem("bework_staking");
@@ -287,4 +339,5 @@ try {
   if (sv) document.getElementById("cfgStaking").value = sv;
   if (tv) document.getElementById("cfgToken").value = tv;
 } catch (e) {}
+buildAgentPrompt();
 </script></body></html>
