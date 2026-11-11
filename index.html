@@ -151,6 +151,27 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 <div class="stats"><div><b id="skRate">—</b><span>Reward rate</span></div><div><b id="skFee">—</b><span>Claim fee</span></div><div><b id="skMin">—</b><span>Minimum claim</span></div><div><b id="skTotalStaked">—</b><span>Total NFTs staked</span></div></div>
 <button class="btn" id="skRefresh">REFRESH</button>
 </div>
+<div class="box" id="market" style="margin-top:26px"><h2>NFT MARKETPLACE</h2>
+<p>Buy and sell BEWORK NPCs for BNB, peer to peer. Listings are held in escrow by the market contract — the NFT and the payment move in a single transaction, and the seller is paid instantly. Market fee <b id="mkFeeLabel" style="color:var(--tx)">2.5%</b>.</p>
+<div class="stats" style="margin-top:14px"><div><b id="mkCount">—</b><span>NPCs for sale</span></div><div><b id="mkFloor">—</b><span>Floor price</span></div></div>
+<p id="mkSoon" style="margin-top:12px;color:var(--or)"></p>
+<div class="grid" id="mkGrid" style="margin-top:16px"></div>
+<button class="btn" id="mkRefresh" style="margin-top:14px">REFRESH LISTINGS</button>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid #1b2350"><h2>SELL YOUR NPC</h2>
+<p>Approve the market once, then list any NPC you own at your price. It waits in escrow until it sells; cancel any time to get it back, free. NPCs that are currently staked must be unstaked first.</p>
+<label for="mkSellId" style="display:block;margin-bottom:8px">Token ID</label>
+<input id="mkSellId" type="number" min="1" max="5000" placeholder="e.g. 305" style="width:100%">
+<label for="mkSellPrice" style="display:block;margin:14px 0 8px">Price (BNB)</label>
+<input id="mkSellPrice" type="text" placeholder="e.g. 0.05" style="width:100%">
+<button class="btn" id="mkApprove" style="margin-top:14px">APPROVE MARKET</button>
+<button class="btn" id="mkList" style="margin-top:14px">LIST NFT</button>
+<p id="mkSellStatus" style="margin-top:10px;color:#39ffb0;word-break:break-word;min-height:18px"></p></div>
+<details style="margin-top:18px"><summary style="cursor:pointer;color:var(--mu)">Market contract settings</summary>
+<label for="mkAddr" style="display:block;margin:12px 0 8px">Marketplace contract address</label>
+<input id="mkAddr" placeholder="0x..." style="width:100%">
+<button class="btn" id="mkSaveAddr" style="margin-top:10px">SAVE</button>
+<p id="mkAddrStatus" style="margin-top:8px;color:var(--mu);font-size:12px"></p></details>
+</div>
 <div class="box" style="margin-top:26px"><h2>$WORK TOKEN</h2>
 <p>WORK is the reward token of BEWORK. Fixed supply, no minting ever again, no tax. Half of the entire supply sits in the staking reserve and can only leave it through holders' claims.</p>
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 4px"><span class="chip">Total supply 1,000,000,000 WORK</span><span class="chip">50% staking rewards</span><span class="chip">40% liquidity</span><span class="chip">10% treasury</span></div>
@@ -474,6 +495,172 @@ for(var i=0;i<btns.length;i++){
     }
   });
 }
+})();
+
+</script>
+<script>
+(function(){
+"use strict";
+var NFT="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee";
+var HARD="";
+var RPCS=["https://bsc-dataseed.binance.org/","https://bsc-rpc.publicnode.com","https://bsc-dataseed1.defibit.io"];
+var S={count:"0xf36065b3",ids:"0x3f626be7",of:"0xe3404981",fee:"0x24a9d853",list:"0x50fd7367",buy:"0xd96a094a",cancel:"0x40e58ee5",ownerOf:"0x6352211e",apprAll:"0xa22cb465",isAppr:"0xe985e9c5"};
+var account=null;
+function $(id){return document.getElementById(id)}
+function market(){var v="";try{v=localStorage.getItem("beworkMarket")||""}catch(e){}return (String(v||HARD)).trim()}
+function validAddr(a){return /^0x[0-9a-fA-F]{40}$/.test(a)}
+function encU(v){return BigInt(v).toString(16).padStart(64,"0")}
+function encA(a){return "000000000000000000000000"+a.toLowerCase().replace("0x","")}
+function fmtBNB(wei){var s=wei.toString().padStart(19,"0");var ip=s.slice(0,s.length-18),fp=s.slice(s.length-18).replace(/0+$/,"");return fp?ip+"."+fp:ip}
+function bnbToWei(s){s=String(s).trim();if(!/^\d+(\.\d+)?$/.test(s))return null;var a=s.split(".");var fp=((a[1]||"")+"000000000000000000").slice(0,18);return BigInt(a[0])*1000000000000000000n+BigInt(fp)}
+function short(a){return a.slice(0,6)+"…"+a.slice(-4)}
+async function rpcBatch(calls){
+  var body=calls.map(function(c,i){return{jsonrpc:"2.0",id:i,method:"eth_call",params:[{to:c.to,data:c.data},"latest"]}});
+  for(var r=0;r<RPCS.length;r++){
+    try{
+      var resp=await fetch(RPCS[r],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      var j=await resp.json();
+      if(Array.isArray(j)){var out=[];for(var i=0;i<calls.length;i++){var f=null;for(var k=0;k<j.length;k++)if(j[k].id===i)f=j[k];out.push(f&&f.result?f.result:null)}return out}
+    }catch(e){}
+  }
+  return calls.map(function(){return null});
+}
+async function rpc(to,data){var r=await rpcBatch([{to:to,data:data}]);return r[0]}
+function decArr(hex){var hh=String(hex).replace("0x","");if(hh.length<128)return[];var n=parseInt(hh.slice(64,128),16),o=[];for(var i=0;i<n;i++)o.push(BigInt("0x"+hh.slice(128+i*64,192+i*64)));return o}
+function prov(){return window.ethereum||null}
+async function ensure(st){
+  var p=prov();
+  if(!p){st.textContent="No wallet found — open this page in the OKX / MetaMask / Trust dApp browser.";return false}
+  if(account)return true;
+  try{
+    var a=await p.request({method:"eth_requestAccounts"});account=a[0];
+    try{await p.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x38"}]})}
+    catch(e){
+      if(e&&e.code===4902){await p.request({method:"wallet_addEthereumChain",params:[{chainId:"0x38",chainName:"BNB Smart Chain",nativeCurrency:{name:"BNB",symbol:"BNB",decimals:18},rpcUrls:["https://bsc-dataseed.binance.org/"],blockExplorerUrls:["https://bscscan.com"]}]})}
+      else throw e;
+    }
+    return true;
+  }catch(e){st.textContent="Connection failed: "+(e&&e.message?e.message:e);return false}
+}
+async function waitReceipt(hash){
+  var p=prov();
+  for(var i=0;i<90;i++){
+    var r=await p.request({method:"eth_getTransactionReceipt",params:[hash]});
+    if(r)return r;
+    await new Promise(function(res){setTimeout(res,2000)});
+  }
+  throw new Error("receipt timeout");
+}
+async function send(to,data,valueHex){
+  var p=prov();
+  var h=await p.request({method:"eth_sendTransaction",params:[{from:account,to:to,data:data,value:valueHex||"0x0"}]});
+  return waitReceipt(h);
+}
+async function load(){
+  var m=market(),grid=$("mkGrid");
+  if(!validAddr(m)){
+    $("mkSoon").textContent="The marketplace contract is being deployed — listings open soon.";
+    $("mkCount").textContent="0";$("mkFloor").textContent="—";grid.innerHTML="";
+    return;
+  }
+  $("mkSoon").textContent="";
+  var head=await rpcBatch([{to:m,data:S.count},{to:m,data:S.fee},{to:m,data:S.ids+encU(0)+encU(60)}]);
+  var cnt=head[0]?BigInt(head[0]):0n;
+  $("mkCount").textContent=cnt.toString();
+  if(head[1])$("mkFeeLabel").textContent=(Number(BigInt(head[1]))/100)+"%";
+  var ids=head[2]?decArr(head[2]):[];
+  if(!ids.length){$("mkFloor").textContent="—";grid.innerHTML='<p style="color:var(--mu)">No NPCs listed yet — be the first seller below.</p>';return}
+  var res=await rpcBatch(ids.map(function(id){return{to:m,data:S.of+encU(id)}}));
+  var floor=null,html="";
+  ids.forEach(function(id,i){
+    var r=res[i];if(!r||r.length<130)return;
+    var seller="0x"+r.slice(26,66),price=BigInt("0x"+r.slice(66,130));
+    if(floor===null||price<floor)floor=price;
+    var mine=account&&seller.toLowerCase()===account.toLowerCase();
+    html+='<div style="background:var(--panel);border:2px solid var(--line);padding:14px">'
+      +'<div style="font-family:\'Pixelify Sans\',monospace;font-size:30px;color:var(--or)">#'+id+'</div>'
+      +'<p style="margin:8px 0;color:var(--tx)"><b>'+fmtBNB(price)+' BNB</b></p>'
+      +'<p style="margin:4px 0;color:var(--mu);font-size:12px">Seller '+short(seller)+(mine?" (you)":"")+'</p>'
+      +(mine
+        ?'<button class="btn mkCancel" data-id="'+id+'" style="margin-top:8px">CANCEL LISTING</button>'
+        :'<button class="btn mkBuy" data-id="'+id+'" data-price="'+price.toString()+'" style="margin-top:8px">BUY NOW</button>')
+      +'</div>';
+  });
+  $("mkFloor").textContent=floor===null?"—":fmtBNB(floor)+" BNB";
+  grid.innerHTML=html||'<p style="color:var(--mu)">Could not load listings — press Refresh.</p>';
+  var bs=grid.querySelectorAll(".mkBuy");for(var i=0;i<bs.length;i++)bs[i].addEventListener("click",function(){doBuy(this)});
+  var cs=grid.querySelectorAll(".mkCancel");for(var j=0;j<cs.length;j++)cs[j].addEventListener("click",function(){doCancel(this)});
+}
+async function doBuy(btn){
+  var st=$("mkSellStatus");
+  if(!await ensure(st))return;
+  var id=btn.getAttribute("data-id"),price=BigInt(btn.getAttribute("data-price"));
+  st.textContent="Buying #"+id+" for "+fmtBNB(price)+" BNB — confirm in your wallet…";
+  try{
+    var rc=await send(market(),S.buy+encU(id),"0x"+price.toString(16));
+    st.textContent=rc.status==="0x1"?("Bought NPC #"+id+" — it is in your wallet now."):("Buy transaction failed (status "+rc.status+").");
+    load();
+  }catch(e){st.textContent="Buy failed: "+(e&&e.message?e.message:e)}
+}
+async function doCancel(btn){
+  var st=$("mkSellStatus");
+  if(!await ensure(st))return;
+  var id=btn.getAttribute("data-id");
+  st.textContent="Cancelling listing #"+id+" — confirm in your wallet…";
+  try{
+    var rc=await send(market(),S.cancel+encU(id),"0x0");
+    st.textContent=rc.status==="0x1"?("Listing #"+id+" cancelled — the NPC is back in your wallet."):("Cancel transaction failed (status "+rc.status+").");
+    load();
+  }catch(e){st.textContent="Cancel failed: "+(e&&e.message?e.message:e)}
+}
+$("mkRefresh").addEventListener("click",load);
+$("mkSaveAddr").addEventListener("click",function(){
+  var v=$("mkAddr").value.trim();
+  if(!validAddr(v)){$("mkAddrStatus").textContent="That does not look like a contract address.";return}
+  try{localStorage.setItem("beworkMarket",v)}catch(e){}
+  $("mkAddrStatus").textContent="Saved. The marketplace is now connected to "+v;
+  load();
+});
+$("mkApprove").addEventListener("click",async function(){
+  var st=$("mkSellStatus"),m=market();
+  if(!validAddr(m)){st.textContent="Marketplace is not live yet — no contract address set.";return}
+  if(!await ensure(st))return;
+  try{
+    var ap=await rpc(NFT,S.isAppr+encA(account)+encA(m));
+    if(ap&&BigInt(ap)===1n){st.textContent="The market is already approved for your NFTs.";return}
+    st.textContent="Approving the market to move your NFTs — confirm in your wallet…";
+    var rc=await send(NFT,S.apprAll+encA(m)+encU(1),"0x0");
+    st.textContent=rc.status==="0x1"?"Approved. You can list NFTs now.":("Approval failed (status "+rc.status+").");
+  }catch(e){st.textContent="Approval failed: "+(e&&e.message?e.message:e)}
+});
+$("mkList").addEventListener("click",async function(){
+  var st=$("mkSellStatus"),m=market();
+  if(!validAddr(m)){st.textContent="Marketplace is not live yet — no contract address set.";return}
+  if(!await ensure(st))return;
+  var idRaw=$("mkSellId").value.trim(),priceWei=bnbToWei($("mkSellPrice").value);
+  if(!/^\d+$/.test(idRaw)){st.textContent="Enter the token ID you want to sell.";return}
+  if(priceWei===null||priceWei<=0n){st.textContent="Enter a valid price in BNB (e.g. 0.05).";return}
+  var id=BigInt(idRaw);
+  try{
+    var owner=await rpc(NFT,S.ownerOf+encU(id));
+    if(!owner){st.textContent="Could not read the owner of #"+idRaw+" — is the ID minted yet?";return}
+    var ownerAddr="0x"+owner.slice(26);
+    if(ownerAddr.toLowerCase()!==account.toLowerCase()){
+      st.textContent="You do not own #"+idRaw+" (owner: "+short(ownerAddr)+"). If it is staked, unstake it first.";
+      return;
+    }
+    var ap=await rpc(NFT,S.isAppr+encA(account)+encA(m));
+    if(!ap||BigInt(ap)!==1n){st.textContent="Approve the market first (APPROVE MARKET button), then list.";return}
+    st.textContent="Listing #"+idRaw+" at "+fmtBNB(priceWei)+" BNB — confirm in your wallet…";
+    var rc=await send(m,S.list+encU(id)+encU(priceWei),"0x0");
+    if(rc.status==="0x1"){st.textContent="Listed! NPC #"+idRaw+" is now for sale at "+fmtBNB(priceWei)+" BNB.";load()}
+    else st.textContent="Listing failed (status "+rc.status+").";
+  }catch(e){st.textContent="Listing failed: "+(e&&e.message?e.message:e)}
+});
+var saved=market();
+if(saved)$("mkAddr").value=saved;
+load();
+setInterval(load,90000);
 })();
 
 </script>
