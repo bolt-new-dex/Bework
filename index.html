@@ -72,7 +72,7 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 <div class="wrap">
 <header>
   <div class="brand px"><canvas id="logo" width="32" height="32" aria-hidden="true"></canvas>BEWORK</div>
-  <div style="display:flex;gap:10px"><a class="btn" href="stake.html" style="text-decoration:none">STAKING</a><button class="btn" id="inst" hidden>INSTALL APP</button><button class="btn" id="wallet">CONNECT</button></div>
+  <div style="display:flex;gap:10px"><a class="btn" href="#staking" style="text-decoration:none">STAKING</a><button class="btn" id="inst" hidden>INSTALL APP</button><button class="btn" id="wallet">CONNECT</button></div>
 </header>
 <section class="hero">
   <div>
@@ -113,10 +113,35 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 </div>
 <div class="grid" id="grid"></div>
 <button class="btn more" id="more">SHOW MORE</button></div>
-<div class="box" style="margin-top:26px"><h2>STAKE &amp; CLAIM WORK</h2>
-<p>Your BEWORK NPCs can work for you. Stake them and earn <b style="color:var(--tx)">10 WORK per hour</b> for every staked NFT — rewards build up from the moment you stake, never retroactively. Claiming sends WORK straight to your wallet in the same transaction: no queues, no manual payouts. Claim fee is 0.00022 BNB, minimum claim 10 WORK, and unstaking is free any time — your NPCs are never locked.</p>
+<div class="box" id="staking" style="margin-top:26px"><h2>STAKE &amp; CLAIM WORK</h2>
+<p>Your BEWORK NPCs can work for you. Stake them and earn <b style="color:var(--tx)">10 WORK per hour</b> for every staked NFT — rewards build up from the moment you stake. Claiming sends WORK straight to your wallet in the same transaction: no queues, no manual payouts. Claim fee is 0.00022 BNB, minimum claim 10 WORK, and unstaking is free any time — your NPCs are never locked.</p>
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 4px"><span class="chip">10 WORK / hour / NFT</span><span class="chip">500,000,000 WORK reserve funded</span><span class="chip">Claim fee 0.00022 BNB</span></div>
-<p style="margin-top:16px"><a class="btn" href="stake.html" style="text-decoration:none">STAKE &amp; CLAIM WORK</a></p>
+<div class="stats" style="margin-top:18px"><div><b id="skPending">—</b><span>Claimable WORK</span></div><div><b id="skStakedCount">—</b><span>Your staked NFTs</span></div><div><b id="skWorkBal">—</b><span>Your WORK balance</span></div><div><b id="skReserve">—</b><span>Staking reserve</span></div></div>
+<button class="btn" id="skClaim" style="font-size:19px;padding:12px 22px">CLAIM WORK</button>
+<p id="skClaimStatus" style="margin-top:12px;color:#39ffb0;word-break:break-word;min-height:18px"></p>
+<div style="margin-top:22px;padding-top:18px;border-top:1px solid #1b2350"><h2>OR CLAIM WITH YOUR AGENT</h2>
+<p>Copy this prompt and send it to your AI agent — the same way as minting. Fill in your Agent ID or agent wallet and the prompt is personalized with it.</p>
+<label for="skAgentId" style="display:block;margin-bottom:8px">Agent ID or agent wallet (optional)</label>
+<input id="skAgentId" placeholder="e.g. 286 or 0x..." style="width:100%;margin-bottom:12px">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Prompt language</span><button class="tab" id="skLen" aria-selected="true">English</button><button class="tab" id="skLzh" aria-selected="false">中文</button></div>
+<pre class="prompt" id="skPrompt"></pre>
+<button class="btn" id="skCopy" style="margin-top:16px">COPY PROMPT</button></div>
+</div>
+<div class="box"><h2>STAKE / UNSTAKE</h2>
+<p>First time only: approve the staking contract to move your NFTs (one approval). Then enter token IDs, separated by commas. Rewards start counting the moment an NFT is staked, and unstaking never touches the rewards you already earned.</p>
+<button class="btn" id="skApprove">APPROVE STAKING</button>
+<p id="skApproveStatus" style="margin-top:10px;color:#39ffb0;word-break:break-word;min-height:18px"></p>
+<label for="skStakeIds" style="display:block;margin:14px 0 8px">Token IDs to stake</label>
+<input id="skStakeIds" placeholder="e.g. 12, 305, 1999" style="width:100%">
+<button class="btn" id="skStake" style="margin-top:14px">STAKE NFTS</button>
+<p id="skStakeStatus" style="margin-top:10px;color:#39ffb0;word-break:break-word;min-height:18px"></p>
+<label for="skUnstakeIds" style="display:block;margin:14px 0 8px">Token IDs to unstake</label>
+<input id="skUnstakeIds" placeholder="e.g. 12, 305" style="width:100%">
+<button class="btn" id="skUnstake" style="margin-top:14px">UNSTAKE NFTS</button>
+<p id="skUnstakeStatus" style="margin-top:10px;color:#39ffb0;word-break:break-word;min-height:18px"></p>
+<p style="margin-top:14px">Your staked token IDs: <span id="skStakedIds" style="color:var(--tx)">—</span></p>
+<div class="stats"><div><b id="skRate">—</b><span>Reward rate</span></div><div><b id="skFee">—</b><span>Claim fee</span></div><div><b id="skMin">—</b><span>Minimum claim</span></div><div><b id="skTotalStaked">—</b><span>Total NFTs staked</span></div></div>
+<button class="btn" id="skRefresh">REFRESH</button>
 </div>
 <footer>BEWORK. Collection of 5,000 on BNB Chain. Art is generated in your browser.</footer>
 </div>
@@ -252,6 +277,43 @@ $("dm").onclick=async()=>{const st=$("dms"),b=$("dm");const say=(t,c)=>{st.textC
 let dip=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;$("inst").hidden=false});
 $("inst").onclick=async()=>{if(!dip)return;dip.prompt();await dip.userChoice;dip=null;$("inst").hidden=true};
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+</script>
+<script>
+(function(){
+var SK_NFT="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee";
+var SK_STAKING="0x61063e84831cb4a92a309b12661e1f70e2fbc339";
+var SK_WORK="0x87f16afc6219e59e0ff2dd59653d98def41a629c";
+var S_BAL="0x70a08231",S_PEND="0xf40f0f52",S_STAKEDOF="0xaf500ba3",S_RATE="0x69629025",S_FEE="0x99d32fc4",S_MIN="0xab937cc1",S_RES="0xa10954fe",S_TOTALSTAKED="0x817b1cd2";
+var S_STAKE="0x0fbf0a93",S_UNSTAKE="0xe449f341",S_CLAIM="0x4e71d92d",S_SETAPPR="0xa22cb465",S_ISAPPR="0xe985e9c5",S_OWNEROF="0x6352211e";
+var skAccount=null,skLang="en";
+function $(i){return document.getElementById(i)}
+function skProvider(){if(window.okxwallet)return window.okxwallet;if(window.ethereum)return window.ethereum;return null}
+function skPad(s,l){while(s.length<l)s="0"+s;return s}
+function skEncA(a){return skPad(a.toLowerCase().replace("0x",""),64)}
+function skEncU(v){return skPad(BigInt(v).toString(16),64)}
+function skFmtW(w){var u=BigInt("1000000000000000000"),a=w/u,f=w%u,s=a.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");if(f===BigInt(0))return s+" WORK";var t=f.toString();while(t.length<18)t="0"+t;return s+"."+t.replace(/0+$/,"")+" WORK"}
+function skFmtB(w){var u=BigInt("1000000000000000000"),a=w/u,f=w%u;if(f===BigInt(0))return a.toString()+" BNB";var t=f.toString();while(t.length<18)t="0"+t;return a.toString()+"."+t.replace(/0+$/,"")+" BNB"}
+async function skCall(to,data){var p=skProvider();return p.request({method:"eth_call",params:[{to:to,data:data},"latest"]})}
+function skDecArr(hex){var h=hex.replace("0x","");if(h.length<128)return[];var n=parseInt(h.slice(64,128),16),o=[];for(var i=0;i<n;i++)o.push(BigInt("0x"+h.slice(128+i*64,192+i*64)));return o}
+function skEncArr(ids){var d=skEncU(32)+skEncU(ids.length);for(var i=0;i<ids.length;i++)d+=skEncU(ids[i]);return d}
+function skParse(str){var ps=String(str).split(/[,\s]+/).filter(function(x){return x.length>0}),o=[];for(var i=0;i<ps.length;i++){if(!/^\d+$/.test(ps[i]))return null;o.push(BigInt(ps[i]))}return o.length?o:null}
+async function skEnsure(statusId){var p=skProvider();if(!p){$(statusId).textContent="No wallet found — open this page in the OKX / MetaMask / Trust dApp browser.";return false}if(skAccount)return true;try{var a=await p.request({method:"eth_requestAccounts"});skAccount=a[0];try{await p.request({method:"wallet_switchEthereumChain",params:[{chainId:"0x38"}]})}catch(e){if(e&&e.code===4902){await p.request({method:"wallet_addEthereumChain",params:[{chainId:"0x38",chainName:"BNB Smart Chain",nativeCurrency:{name:"BNB",symbol:"BNB",decimals:18},rpcUrls:["https://bsc-dataseed.binance.org/"],blockExplorerUrls:["https://bscscan.com"]}]})}else throw e}return true}catch(e){$(statusId).textContent="Connection failed: "+(e&&e.message?e.message:e);return false}}
+async function skSend(to,data,valueHex,statusId){var p=skProvider();try{var prm={from:skAccount,to:to,data:data};if(valueHex)prm.value=valueHex;var h=await p.request({method:"eth_sendTransaction",params:[prm]});$(statusId).textContent="Transaction sent: "+h+". Waiting for confirmation…";for(var i=0;i<40;i++){await new Promise(function(r){setTimeout(r,3000)});var rc=await p.request({method:"eth_getTransactionReceipt",params:[h]});if(rc){if(rc.status==="0x1"){$(statusId).textContent="Success: "+h;return h}$(statusId).textContent="Transaction failed on chain: "+h;return null}}$(statusId).textContent="Transaction sent but not confirmed after 2 minutes: "+h;return h}catch(e){$(statusId).textContent="Failed: "+(e&&e.message?e.message:e);return null}}
+function skIdentity(){var v=$("skAgentId").value.trim();if(/^0x[0-9a-fA-F]{40}$/.test(v))return{kind:"wallet",val:v};if(/^\d+$/.test(v))return{kind:"id",val:v};if(skAccount)return{kind:"wallet",val:skAccount};return null}
+function skBuildPrompt(){var idn=skIdentity(),txt;if(skLang==="en"){var idEn=idn?(idn.kind==="wallet"?" Agent wallet: "+idn.val+".":" Agent ID: "+idn.val+" — claim from the wallet holding this Agent ID."):"";var who=idn?(idn.kind==="wallet"?idn.val:"the wallet holding Agent ID "+idn.val):"yourWallet";txt="Claim my BEWORK staking rewards on BNB Chain (chain id 56) from your own wallet."+idEn+"\n\nAbout it: BEWORK NPC holders stake their NFTs in the BeworkStaking contract to earn WORK, the BEWORK token. Rewards accrue at 10 WORK per hour for every staked NFT, counted from the moment it is staked.\n\nTerms: minimum claim 10 WORK. Every claim attaches a fee of exactly 0.00022 BNB.\n\nContract: "+SK_STAKING+" (BNB Smart Chain)\nHow: first call pendingReward("+who+"). If it returns less than 10000000000000000000 (10 WORK), do not claim — report the accrued amount instead. Otherwise call claim() sending exactly 220000000000000 wei (0.00022 BNB) as value.\nThe WORK is transferred to the calling wallet only, in the same transaction. Report the transaction hash and the amount of WORK received."}else{var idZh=idn?(idn.kind==="wallet"?" 代理钱包："+idn.val+"。":" 代理 ID："+idn.val+"——请使用持有该 Agent ID 的钱包领取。"):"";var whoZh=idn?(idn.kind==="wallet"?idn.val:"持有 Agent ID "+idn.val+" 的钱包"):"你的钱包";txt="在 BNB Chain（链 ID 56）上，用你自己的钱包领取我的 BEWORK 质押奖励。"+idZh+"\n\n简介：BEWORK NPC 持有者可将 NFT 质押到 BeworkStaking 合约赚取 WORK（BEWORK 代币）。每个质押的 NFT 自质押之时起每小时累积 10 WORK。\n\n条款：最低领取 10 WORK；每次领取须附带恰好 0.00022 BNB 作为费用。\n\n合约："+SK_STAKING+"（BNB Smart Chain）\n步骤：先调用 pendingReward("+whoZh+")。如果返回值小于 10000000000000000000（10 WORK），不要领取，改为报告已累积的数量。否则调用 claim()，并发送恰好 220000000000000 wei（0.00022 BNB）作为 value。\nWORK 只会转到调用的钱包，并在同一笔交易中到账。完成后请报告交易哈希和收到的 WORK 数量。"}$("skPrompt").textContent=txt;$("skLen").setAttribute("aria-selected",skLang==="en");$("skLzh").setAttribute("aria-selected",skLang==="zh")}
+async function skRefresh(){var p=skProvider();if(!p)return;try{var rate=BigInt(await skCall(SK_STAKING,S_RATE)),fee=BigInt(await skCall(SK_STAKING,S_FEE)),minC=BigInt(await skCall(SK_STAKING,S_MIN)),res=BigInt(await skCall(SK_STAKING,S_RES)),tot=BigInt(await skCall(SK_STAKING,S_TOTALSTAKED));$("skRate").textContent=skFmtW(rate)+" / hour";$("skFee").textContent=skFmtB(fee);$("skMin").textContent=skFmtW(minC);$("skReserve").textContent=skFmtW(res);$("skTotalStaked").textContent=tot.toString();if(skAccount){var wb=BigInt(await skCall(SK_WORK,S_BAL+skEncA(skAccount))),pend=BigInt(await skCall(SK_STAKING,S_PEND+skEncA(skAccount))),ids=skDecArr(await skCall(SK_STAKING,S_STAKEDOF+skEncA(skAccount)));$("skWorkBal").textContent=skFmtW(wb);$("skPending").textContent=skFmtW(pend);$("skStakedCount").textContent=ids.length.toString();$("skStakedIds").textContent=ids.length?ids.map(function(x){return x.toString()}).join(", "):"(none)"}}catch(e){}}
+$("skClaim").onclick=async function(){if(!await skEnsure("skClaimStatus"))return;skBuildPrompt();try{var fee=BigInt(await skCall(SK_STAKING,S_FEE)),minC=BigInt(await skCall(SK_STAKING,S_MIN)),pend=BigInt(await skCall(SK_STAKING,S_PEND+skEncA(skAccount)));$("skPending").textContent=skFmtW(pend);if(pend<minC){$("skClaimStatus").textContent="You have accrued "+skFmtW(pend)+" — the minimum claim is "+skFmtW(minC)+". Stake an NFT below, or wait for more rewards to build up (10 WORK per hour per staked NFT).";skRefresh();return}var h=await skSend(SK_STAKING,S_CLAIM,"0x"+fee.toString(16),"skClaimStatus");if(h){$("skClaimStatus").textContent="WORK sent straight to your wallet: "+h;skRefresh()}}catch(e){$("skClaimStatus").textContent="Failed: "+(e&&e.message?e.message:e)}};
+$("skCopy").onclick=async function(){var b=$("skCopy");try{await navigator.clipboard.writeText($("skPrompt").textContent);b.textContent="COPIED"}catch(e){var r=document.createRange();r.selectNodeContents($("skPrompt"));getSelection().removeAllRanges();getSelection().addRange(r);b.textContent="SELECTED, COPY IT"}setTimeout(function(){b.textContent="COPY PROMPT"},1800)};
+$("skAgentId").addEventListener("input",skBuildPrompt);
+$("skLen").onclick=function(){skLang="en";skBuildPrompt()};
+$("skLzh").onclick=function(){skLang="zh";skBuildPrompt()};
+$("skApprove").onclick=async function(){if(!await skEnsure("skApproveStatus"))return;try{var al=await skCall(SK_NFT,S_ISAPPR+skEncA(skAccount)+skEncA(SK_STAKING));if(BigInt(al)===BigInt(1)){$("skApproveStatus").textContent="Already approved — no need to approve again.";return}}catch(e){}var h=await skSend(SK_NFT,S_SETAPPR+skEncA(SK_STAKING)+skEncU(1),null,"skApproveStatus");if(h)$("skApproveStatus").textContent="Approval active: "+h};
+$("skStake").onclick=async function(){if(!await skEnsure("skStakeStatus"))return;var ids=skParse($("skStakeIds").value);if(!ids){$("skStakeStatus").textContent="Invalid IDs — enter token ID numbers separated by commas.";return}for(var i=0;i<ids.length;i++){try{var ow=await skCall(SK_NFT,S_OWNEROF+skEncU(ids[i]));if(ow.toLowerCase().indexOf(skAccount.toLowerCase().replace("0x",""))===-1){$("skStakeStatus").textContent="Token "+ids[i].toString()+" does not belong to this wallet.";return}}catch(e){$("skStakeStatus").textContent="Could not verify the owner of token "+ids[i].toString()+": "+e.message;return}}var h=await skSend(SK_STAKING,S_STAKE+skEncArr(ids),null,"skStakeStatus");if(h)skRefresh()};
+$("skUnstake").onclick=async function(){if(!await skEnsure("skUnstakeStatus"))return;var ids=skParse($("skUnstakeIds").value);if(!ids){$("skUnstakeStatus").textContent="Invalid IDs — enter token ID numbers separated by commas.";return}var h=await skSend(SK_STAKING,S_UNSTAKE+skEncArr(ids),null,"skUnstakeStatus");if(h)skRefresh()};
+$("skRefresh").onclick=async function(){await skEnsure("skClaimStatus");skBuildPrompt();skRefresh()};
+skBuildPrompt();
+(async function(){var p=skProvider();if(!p)return;try{var a=await p.request({method:"eth_accounts"});if(a&&a.length){skAccount=a[0];skBuildPrompt()}}catch(e){}skRefresh()})();
+})();
 </script>
 </body>
 </html>
