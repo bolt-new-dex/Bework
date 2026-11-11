@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BEWORK — Konsol Deploy Token + Staking (Owner)</title>
+<title>BEWORK — Token + Staking Deploy Console (Owner)</title>
 <style>
   body{background:#0b0e14;color:#e8eaf0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 14px 60px}
   .wrap{max-width:820px;margin:0 auto}
@@ -30,71 +30,71 @@
 </style></head>
 <body><div class="wrap">
 
-<h1>BEWORK — Konsol Deploy Token + Staking (Owner)</h1>
-<p class="sub">Halaman khusus owner: deploy token BEWORK (WORK) dan kontrak BeworkStaking, supaya holder NFT BEWORK bisa staking NFT dan mengklaim WORK. Setiap langkah ditandatangani wallet owner — tidak ada yang berjalan otomatis.</p>
+<h1>BEWORK — Token + Staking Deploy Console (Owner)</h1>
+<p class="sub">Owner-only page: deploy the BEWORK (WORK) token and the BeworkStaking contract so BEWORK NFT holders can stake their NFTs and claim WORK. Every step is signed by the owner wallet — nothing runs automatically.</p>
 
 <div class="facts"><ul>
-<li>Paket ini <b>kontrak baru yang terpisah</b>: token WORK + kontrak staking. Kontrak NFT BEWORK <b>tidak diubah sama sekali</b> — staking bekerja lewat approve/transfer ERC-721 standar.</li>
-<li>Token: <b>BEWORK (WORK)</b>, suplai tetap <b>1.000.000.000</b>, seluruhnya masuk ke wallet deployer saat deploy; tidak ada fungsi mint/burn sesudahnya, suplai tidak pernah berubah. Pembagian yang direncanakan (dieksekusi owner dari walletnya): <b>50% cadangan staking</b> (500 jt, langkah 04), <b>40% LP</b>, <b>10% treasury</b>.</li>
-<li>Staking: reward <b>10 WORK / jam per NFT</b> yang di-stake (240 WORK/hari), dihitung sejak NFT masuk — tidak retroaktif. Klaim <b>langsung mengirim WORK ke wallet pengklaim dalam transaksi yang sama</b>; tidak ada pengiriman manual per orang. Owner hanya mengisi cadangan reward di kontrak staking.</li>
-<li>Setiap klaim wajib melampirkan fee <b>0,00022 BNB</b>; fee terkumpul di kontrak staking dan bisa ditarik owner (withdrawFees). Klaim minimum <b>10 WORK</b>. Unstake selalu gratis dan tidak pernah tertahan saldo cadangan.</li>
-<li>Kalau cadangan WORK di kontrak staking kurang dari reward seseorang, klaim membayar sebesar yang tersedia dan sisanya tetap tercatat untuk diklaim nanti — reward tidak hangus.</li>
-<li>Kontrak NFT BEWORK (sudah terdeploy, tidak disentuh): <code>0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee</code>.</li>
+<li>This package is a <b>separate new set of contracts</b>: the WORK token + a staking contract. The BEWORK NFT contract is <b>not modified in any way</b> — staking works through standard ERC-721 approvals and transfers.</li>
+<li>Token: <b>BEWORK (WORK)</b>, fixed supply of <b>1,000,000,000</b>, all of it minted to the deployer wallet at deployment; there is no mint or burn function afterwards, so the supply never changes. Planned allocation (executed by the owner from their wallet): <b>50% staking reserve</b> (500M, step 04), <b>40% LP</b>, <b>10% treasury</b>.</li>
+<li>Staking: reward of <b>10 WORK per hour per staked NFT</b> (240 WORK/day), counted from the moment the NFT is staked — never retroactive. Claiming <b>sends WORK directly to the claimer's wallet in the same transaction</b>; there is no manual per-person distribution. The owner only funds the reward reserve held by the staking contract.</li>
+<li>Every claim must attach a fee of <b>0.00022 BNB</b>; fees accumulate in the staking contract and can be withdrawn by the owner (withdrawFees). Minimum claim is <b>10 WORK</b>. Unstaking is always free and is never blocked by the reserve balance.</li>
+<li>If the WORK reserve in the staking contract is smaller than someone's rewards, a claim pays what is available and the rest stays recorded for a later claim — rewards are never lost.</li>
+<li>BEWORK NFT contract (already deployed, untouched): <code>0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee</code>.</li>
 </ul>
-<p class="small">Peringatan: kontrak ini <b>belum diaudit</b>. Operasikan hanya dengan wallet milikmu sendiri, di dApp browser (OKX / MetaMask / Trust). Jangan pernah membagikan seed phrase atau private key ke siapa pun.</p></div>
+<p class="small">Warning: these contracts are <b>not audited</b>. Operate only with your own wallet, in a dApp browser (OKX / MetaMask / Trust). Never share your seed phrase or private key with anyone.</p></div>
 
-<div class="card"><h2>01 — Hubungkan wallet owner</h2>
-<p>Hubungkan wallet yang akan memiliki token dan kontrak staking. Halaman akan otomatis beralih ke BNB Smart Chain.</p>
-<p><button id="connectBtn">Hubungkan wallet (OKX diutamakan)</button></p>
-<p class="status" id="walletLine">Belum terhubung.</p>
-<p class="small">Halaman ini mendeteksi OKX (<code>window.okxwallet</code>) lebih dulu, lalu wallet lain, dan akan meminta beralih/menambah BNB Smart Chain (56).</p></div>
+<div class="card"><h2>01 — Connect the owner wallet</h2>
+<p>Connect the wallet that will own the token and the staking contract. The page switches to BNB Smart Chain automatically.</p>
+<p><button id="connectBtn">Connect wallet (OKX preferred)</button></p>
+<p class="status" id="walletLine">Not connected.</p>
+<p class="small">This page detects OKX (<code>window.okxwallet</code>) first, then other wallets, and asks to switch to / add BNB Smart Chain (56).</p></div>
 
-<div class="card"><h2>02 — Deploy token BEWORK (WORK)</h2>
-<p>Deploy token ERC-20 BEWORK (WORK) tanpa parameter konstruktor. Setelah deploy, 1.000.000.000 WORK seluruhnya masuk ke wallet kamu dan alamatnya otomatis terisi ke langkah 03–05.</p>
-<p><button id="deployTokenBtn">Deploy token BEWORK (WORK)</button></p>
-<p class="status" id="tokenStatus">Menunggu wallet terhubung.</p></div>
+<div class="card"><h2>02 — Deploy the BEWORK (WORK) token</h2>
+<p>Deploy the BEWORK (WORK) ERC-20 token with no constructor arguments. After deployment, all 1,000,000,000 WORK land in your wallet and the address is filled into steps 03–05 automatically.</p>
+<p><button id="deployTokenBtn">Deploy the BEWORK (WORK) token</button></p>
+<p class="status" id="tokenStatus">Waiting for the wallet to connect.</p></div>
 
 <div class="card"><h2>03 — Deploy BeworkStaking</h2>
-<p>Deploy kontrak staking. Parameter konstruktor: alamat NFT BEWORK (sudah terisi), alamat token WORK (otomatis dari langkah 02, bisa diubah), rate 10 WORK/jam per NFT, fee klaim 0,00022 BNB, klaim minimum 10 WORK — tiga nilai terakhir tertanam dari halaman ini dan bisa diubah owner sesudahnya lewat setRewardRate / setClaimFee / setMinClaim.</p>
-<label>Alamat kontrak NFT BEWORK (parameter konstruktor)</label>
+<p>Deploy the staking contract. Constructor parameters: the BEWORK NFT address (prefilled), the WORK token address (automatic from step 02, editable), a rate of 10 WORK/hour per NFT, a claim fee of 0.00022 BNB, and a minimum claim of 10 WORK — the last three are baked in from this page and can be changed by the owner later via setRewardRate / setClaimFee / setMinClaim.</p>
+<label>BEWORK NFT contract address (constructor parameter)</label>
 <input id="sNftInput" value="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee">
-<label>Alamat token WORK (parameter konstruktor)</label>
-<input id="sTokenInput" placeholder="0x… alamat token WORK">
+<label>WORK token address (constructor parameter)</label>
+<input id="sTokenInput" placeholder="0x… WORK token address">
 <p><button id="deployStakingBtn">Deploy BeworkStaking</button></p>
 <p class="status" id="stakingStatus"></p></div>
 
-<div class="card"><h2>04 — Isi cadangan staking</h2>
-<p>Transfer WORK dari wallet kamu ke kontrak staking sebagai cadangan reward. Dari cadangan inilah klaim para holder dibayar — isi sekali di awal (sesuai tokenomik: 500.000.000 WORK), tambah lagi hanya kalau cadangan menipis.</p>
-<label>Alamat token WORK</label>
-<input id="fTokenInput" placeholder="0x… alamat token WORK">
-<label>Alamat kontrak staking</label>
-<input id="fStakingInput" placeholder="0x… alamat BeworkStaking">
-<label>Jumlah isi (WORK)</label>
+<div class="card"><h2>04 — Fund the staking reserve</h2>
+<p>Transfer WORK from your wallet into the staking contract as the reward reserve. Holders' claims are paid from this reserve — fund it once up front (per the tokenomics: 500,000,000 WORK) and top it up only when it runs low.</p>
+<label>WORK token address</label>
+<input id="fTokenInput" placeholder="0x… WORK token address">
+<label>Staking contract address</label>
+<input id="fStakingInput" placeholder="0x… BeworkStaking address">
+<label>Amount to fund (WORK)</label>
 <input id="fundAmount" value="500000000">
-<p><button id="fundBtn">Transfer cadangan</button> <button id="reserveBtn" class="alt">Segarkan cadangan</button></p>
+<p><button id="fundBtn">Transfer reserve</button> <button id="reserveBtn" class="alt">Refresh reserve</button></p>
 <p class="status" id="fundStatus"></p>
-<p class="small">Cadangan kontrak staking saat ini: <span id="reserveNow">—</span></p></div>
+<p class="small">Current staking contract reserve: <span id="reserveNow">—</span></p></div>
 
-<div class="card"><h2>05 — Status + ringkasan deploy</h2>
-<p>Status langsung dari chain. Salin ringkasan dan kirim ke Muse supaya halaman staking holder bisa disambungkan ke alamat final.</p>
-<label>Alamat token WORK</label>
-<input id="vTokenInput" placeholder="0x… alamat token WORK">
-<label>Alamat kontrak staking</label>
-<input id="vStakingInput" placeholder="0x… alamat BeworkStaking">
+<div class="card"><h2>05 — Status + deployment summary</h2>
+<p>Live status read from the chain. Copy the summary and send it to Muse so the holder staking page can be wired to the final addresses.</p>
+<label>WORK token address</label>
+<input id="vTokenInput" placeholder="0x… WORK token address">
+<label>Staking contract address</label>
+<input id="vStakingInput" placeholder="0x… BeworkStaking address">
 <div class="grid">
-<div class="cell"><div class="k">Total suplai token</div><div class="v" id="stSupply">—</div></div>
-<div class="cell"><div class="k">Cadangan staking</div><div class="v" id="stReserve">—</div></div>
-<div class="cell"><div class="k">Rate reward</div><div class="v" id="stRate">—</div></div>
-<div class="cell"><div class="k">Fee klaim</div><div class="v" id="stFee">—</div></div>
-<div class="cell"><div class="k">Total NFT di-stake</div><div class="v" id="stStaked">—</div></div>
-<div class="cell"><div class="k">Saldo WORK kamu</div><div class="v" id="stMyBal">—</div></div>
+<div class="cell"><div class="k">Total token supply</div><div class="v" id="stSupply">—</div></div>
+<div class="cell"><div class="k">Staking reserve</div><div class="v" id="stReserve">—</div></div>
+<div class="cell"><div class="k">Reward rate</div><div class="v" id="stRate">—</div></div>
+<div class="cell"><div class="k">Claim fee</div><div class="v" id="stFee">—</div></div>
+<div class="cell"><div class="k">Total NFTs staked</div><div class="v" id="stStaked">—</div></div>
+<div class="cell"><div class="k">Your WORK balance</div><div class="v" id="stMyBal">—</div></div>
 </div>
-<p><button id="stateBtn" class="alt">Segarkan status</button></p>
+<p><button id="stateBtn" class="alt">Refresh status</button></p>
 <textarea id="summaryBox" readonly></textarea>
-<p><button id="copySummaryBtn" class="alt">Salin ringkasan</button></p>
+<p><button id="copySummaryBtn" class="alt">Copy summary</button></p>
 <p class="status" id="summaryStatus"></p></div>
 
-<p class="foot">BeworkToken dan BeworkStaking terdeploy terpisah; kontrak NFT BEWORK tidak diubah. Jaringan: BNB Smart Chain (56), RPC <code>https://bsc-dataseed.binance.org/</code>.</p>
+<p class="foot">BeworkToken and BeworkStaking are deployed separately; the BEWORK NFT contract is not modified. Network: BNB Smart Chain (56), RPC <code>https://bsc-dataseed.binance.org/</code>.</p>
 
 </div>
 <script>
@@ -150,44 +150,44 @@ async function callRead(to, data){
 }
 async function deployContract(bytecode, extraData, statusId, onDone){
   var p = provider();
-  if (!p || !account) { document.getElementById(statusId).textContent = "Hubungkan wallet dulu (langkah 01)."; return; }
+  if (!p || !account) { document.getElementById(statusId).textContent = "Connect the wallet first (step 01)."; return; }
   var data = bytecode + (extraData || "");
   try {
     var gas = await p.request({method:"eth_estimateGas", params:[{from: account, data: data}]});
-    document.getElementById(statusId).textContent = "Perkiraan gas: " + hexToInt(gas) + ". Mengirim transaksi deploy…";
+    document.getElementById(statusId).textContent = "Estimated gas: " + hexToInt(gas) + ". Sending the deployment transaction…";
     var txHash = await p.request({method:"eth_sendTransaction", params:[{from: account, data: data}]});
-    document.getElementById(statusId).textContent = "Transaksi terkirim: " + txHash + ". Menunggu receipt…";
+    document.getElementById(statusId).textContent = "Transaction sent: " + txHash + ". Waiting for the receipt…";
     var tries = 0;
     var timer = setInterval(async function(){
       tries++;
       var r = await p.request({method:"eth_getTransactionReceipt", params:[txHash]});
       if (r && r.contractAddress) { clearInterval(timer); onDone(r.contractAddress, txHash); }
-      else if (tries > 60) { clearInterval(timer); document.getElementById(statusId).textContent = "Masih tanpa receipt setelah 60x cek — lihat transaksi ini di BscScan: " + txHash; }
+      else if (tries > 60) { clearInterval(timer); document.getElementById(statusId).textContent = "Still no receipt after 60 checks — look up this transaction on BscScan: " + txHash; }
     }, 3000);
-  } catch (e) { document.getElementById(statusId).textContent = "Gagal: " + (e && e.message ? e.message : e); }
+  } catch (e) { document.getElementById(statusId).textContent = "Failed: " + (e && e.message ? e.message : e); }
 }
 function buildSummary(){
-  var t = document.getElementById("vTokenInput").value.trim() || tokenAddress || "(belum terdeploy)";
-  var s = document.getElementById("vStakingInput").value.trim() || stakingAddress || "(belum terdeploy)";
+  var t = document.getElementById("vTokenInput").value.trim() || tokenAddress || "(not deployed yet)";
+  var s = document.getElementById("vStakingInput").value.trim() || stakingAddress || "(not deployed yet)";
   var lines = [
-    "Ringkasan deploy BEWORK WORK + Staking — kirim ini ke Muse",
-    "Token WORK: " + t,
-    "Kontrak staking (BeworkStaking): " + s,
-    "Kontrak NFT BEWORK: " + NFT_DEFAULT,
-    "Owner: " + (account || "(hubungkan wallet dulu)"),
-    "Jaringan: BNB Smart Chain (56)",
-    "Cadangan staking: " + document.getElementById("stReserve").textContent,
-    "Rate reward: " + document.getElementById("stRate").textContent,
-    "Fee klaim: " + document.getElementById("stFee").textContent,
+    "BEWORK WORK + Staking deployment summary — send this to Muse",
+    "WORK token: " + t,
+    "Staking contract (BeworkStaking): " + s,
+    "BEWORK NFT contract: " + NFT_DEFAULT,
+    "Owner: " + (account || "(connect the wallet first)"),
+    "Network: BNB Smart Chain (56)",
+    "Staking reserve: " + document.getElementById("stReserve").textContent,
+    "Reward rate: " + document.getElementById("stRate").textContent,
+    "Claim fee: " + document.getElementById("stFee").textContent,
     "BscScan token: https://bscscan.com/address/" + t,
     "BscScan staking: https://bscscan.com/address/" + s,
-    "Langkah berikutnya: sambungkan halaman staking holder (stake.html) ke alamat staking + token di atas."
+    "Next step: wire the holder staking page (stake.html) to the staking + token addresses above."
   ];
   document.getElementById("summaryBox").value = lines.join("\n");
 }
 document.getElementById("connectBtn").onclick = async function(){
   var p = provider();
-  if (!p) { document.getElementById("walletLine").textContent = "Wallet tidak ditemukan — buka halaman ini di dApp browser OKX / MetaMask / Trust."; return; }
+  if (!p) { document.getElementById("walletLine").textContent = "No wallet found — open this page in the OKX / MetaMask / Trust dApp browser."; return; }
   try {
     var accs = await p.request({method:"eth_requestAccounts"});
     account = accs[0];
@@ -196,10 +196,10 @@ document.getElementById("connectBtn").onclick = async function(){
       if (e && e.code === 4902) { await p.request({method:"wallet_addEthereumChain", params:[{chainId:"0x38", chainName:"BNB Smart Chain", nativeCurrency:{name:"BNB", symbol:"BNB", decimals:18}, rpcUrls:["https://bsc-dataseed.binance.org/"], blockExplorerUrls:["https://bscscan.com"]}]}); }
       else throw e;
     }
-    document.getElementById("walletLine").textContent = "Terhubung: " + account;
-    document.getElementById("tokenStatus").textContent = "Wallet terhubung. Token siap dideploy.";
+    document.getElementById("walletLine").textContent = "Connected: " + account;
+    document.getElementById("tokenStatus").textContent = "Wallet connected. The token is ready to deploy.";
     buildSummary();
-  } catch (e) { document.getElementById("walletLine").textContent = "Koneksi gagal: " + (e && e.message ? e.message : e); }
+  } catch (e) { document.getElementById("walletLine").textContent = "Connection failed: " + (e && e.message ? e.message : e); }
 };
 document.getElementById("deployTokenBtn").onclick = function(){
   deployContract(TOKEN_BYTECODE, "", "tokenStatus", function(addr, txHash){
@@ -207,56 +207,56 @@ document.getElementById("deployTokenBtn").onclick = function(){
     document.getElementById("sTokenInput").value = addr;
     document.getElementById("fTokenInput").value = addr;
     document.getElementById("vTokenInput").value = addr;
-    document.getElementById("tokenStatus").textContent = "Token BEWORK (WORK) terdeploy di: " + addr + " (tx " + txHash + "). 1.000.000.000 WORK sudah masuk ke wallet kamu. Alamat otomatis terisi ke langkah 03–05 — lanjut deploy BeworkStaking.";
+    document.getElementById("tokenStatus").textContent = "BEWORK (WORK) token deployed at: " + addr + " (tx " + txHash + "). All 1,000,000,000 WORK are in your wallet. The address was filled into steps 03–05 — continue by deploying BeworkStaking.";
     buildSummary();
   });
 };
 document.getElementById("deployStakingBtn").onclick = function(){
   var nftAddr = document.getElementById("sNftInput").value.trim();
   var tokAddr = document.getElementById("sTokenInput").value.trim();
-  if (!validAddr(nftAddr)) { document.getElementById("stakingStatus").textContent = "Alamat kontrak NFT tidak valid."; return; }
-  if (!validAddr(tokAddr)) { document.getElementById("stakingStatus").textContent = "Alamat token WORK tidak valid — selesaikan langkah 02 dulu."; return; }
+  if (!validAddr(nftAddr)) { document.getElementById("stakingStatus").textContent = "Invalid NFT contract address."; return; }
+  if (!validAddr(tokAddr)) { document.getElementById("stakingStatus").textContent = "Invalid WORK token address — finish step 02 first."; return; }
   var extra = encodeAddr(nftAddr) + encodeAddr(tokAddr) + encodeUint(RATE_PER_HOUR_WEI) + encodeUint(CLAIM_FEE_WEI) + encodeUint(MIN_CLAIM_WEI);
   deployContract(STAKING_BYTECODE, extra, "stakingStatus", function(addr, txHash){
     stakingAddress = addr;
     document.getElementById("fStakingInput").value = addr;
     document.getElementById("vStakingInput").value = addr;
-    document.getElementById("stakingStatus").textContent = "BeworkStaking terdeploy di: " + addr + " (tx " + txHash + "). Alamat otomatis terisi ke langkah 04–05. Lanjut isi cadangan staking di langkah 04.";
+    document.getElementById("stakingStatus").textContent = "BeworkStaking deployed at: " + addr + " (tx " + txHash + "). The address was filled into steps 04–05. Continue by funding the staking reserve in step 04.";
     buildSummary();
   });
 };
 async function refreshReserve(){
   var t = document.getElementById("fTokenInput").value.trim();
   var s = document.getElementById("fStakingInput").value.trim();
-  if (!validAddr(t) || !validAddr(s)) { document.getElementById("reserveNow").textContent = "Isi dulu alamat token dan kontrak staking."; return; }
+  if (!validAddr(t) || !validAddr(s)) { document.getElementById("reserveNow").textContent = "Fill in the token and staking contract addresses first."; return; }
   try {
     var r = await callRead(s, SEL_RESERVE);
     document.getElementById("reserveNow").textContent = fmtWork(BigInt(r));
-  } catch (e) { document.getElementById("reserveNow").textContent = "Gagal membaca: " + e.message; }
+  } catch (e) { document.getElementById("reserveNow").textContent = "Read failed: " + e.message; }
 }
 document.getElementById("reserveBtn").onclick = refreshReserve;
 document.getElementById("fundBtn").onclick = async function(){
   var p = provider();
-  if (!p || !account) { document.getElementById("fundStatus").textContent = "Hubungkan wallet dulu (langkah 01)."; return; }
+  if (!p || !account) { document.getElementById("fundStatus").textContent = "Connect the wallet first (step 01)."; return; }
   var t = document.getElementById("fTokenInput").value.trim();
   var s = document.getElementById("fStakingInput").value.trim();
-  if (!validAddr(t)) { document.getElementById("fundStatus").textContent = "Alamat token WORK tidak valid."; return; }
-  if (!validAddr(s)) { document.getElementById("fundStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
+  if (!validAddr(t)) { document.getElementById("fundStatus").textContent = "Invalid WORK token address."; return; }
+  if (!validAddr(s)) { document.getElementById("fundStatus").textContent = "Invalid staking contract address."; return; }
   var wei = workToWei(document.getElementById("fundAmount").value);
-  if (wei === null || wei <= BigInt(0)) { document.getElementById("fundStatus").textContent = "Jumlah tidak valid (isi angka WORK, maks 18 desimal)."; return; }
+  if (wei === null || wei <= BigInt(0)) { document.getElementById("fundStatus").textContent = "Invalid amount (enter a WORK amount, up to 18 decimals)."; return; }
   try {
     var data = SEL_TRANSFER + encodeAddr(s) + encodeUint(wei);
     var h = await p.request({method:"eth_sendTransaction", params:[{from: account, to: t, data: data}]});
-    document.getElementById("fundStatus").textContent = "Transaksi transfer terkirim: " + h + " (" + fmtWork(wei) + "). Setelah terkonfirmasi, klik Segarkan cadangan untuk memeriksa.";
-  } catch (e) { document.getElementById("fundStatus").textContent = "Gagal: " + (e && e.message ? e.message : e); }
+    document.getElementById("fundStatus").textContent = "Transfer transaction sent: " + h + " (" + fmtWork(wei) + "). Once confirmed, click Refresh reserve to check.";
+  } catch (e) { document.getElementById("fundStatus").textContent = "Failed: " + (e && e.message ? e.message : e); }
 };
 document.getElementById("stateBtn").onclick = async function(){
   var p = provider();
-  if (!p) { document.getElementById("summaryStatus").textContent = "Hubungkan wallet dulu (langkah 01)."; return; }
+  if (!p) { document.getElementById("summaryStatus").textContent = "Connect the wallet first (step 01)."; return; }
   var t = document.getElementById("vTokenInput").value.trim();
   var s = document.getElementById("vStakingInput").value.trim();
-  if (!validAddr(t)) { document.getElementById("summaryStatus").textContent = "Alamat token WORK tidak valid."; return; }
-  if (!validAddr(s)) { document.getElementById("summaryStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
+  if (!validAddr(t)) { document.getElementById("summaryStatus").textContent = "Invalid WORK token address."; return; }
+  if (!validAddr(s)) { document.getElementById("summaryStatus").textContent = "Invalid staking contract address."; return; }
   try {
     var supply = BigInt(await callRead(t, SEL_TOTALSUPPLY));
     var reserve = BigInt(await callRead(s, SEL_RESERVE));
@@ -265,22 +265,22 @@ document.getElementById("stateBtn").onclick = async function(){
     var staked = BigInt(await callRead(s, SEL_TOTALSTAKED));
     document.getElementById("stSupply").textContent = fmtWork(supply);
     document.getElementById("stReserve").textContent = fmtWork(reserve);
-    document.getElementById("stRate").textContent = fmtWork(rate) + " / jam / NFT";
-    document.getElementById("stFee").textContent = fmtBnb(fee) + " / klaim";
+    document.getElementById("stRate").textContent = fmtWork(rate) + " / hour / NFT";
+    document.getElementById("stFee").textContent = fmtBnb(fee) + " / claim";
     document.getElementById("stStaked").textContent = staked.toString() + " NFT";
     if (account) {
       var myBal = BigInt(await callRead(t, SEL_BALANCEOF + encodeAddr(account)));
       document.getElementById("stMyBal").textContent = fmtWork(myBal);
     }
-    document.getElementById("summaryStatus").textContent = "Status sudah disegarkan dari chain.";
+    document.getElementById("summaryStatus").textContent = "Status refreshed from chain.";
     buildSummary();
-  } catch (e) { document.getElementById("summaryStatus").textContent = "Gagal membaca: " + e.message + " (pastikan alamat benar dan sudah terdeploy)."; }
+  } catch (e) { document.getElementById("summaryStatus").textContent = "Read failed: " + e.message + " (make sure the addresses are correct and deployed)."; }
 };
 document.getElementById("copySummaryBtn").onclick = function(){
   buildSummary();
   var box = document.getElementById("summaryBox");
   box.select();
-  if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function(){ document.getElementById("summaryStatus").textContent = "Ringkasan tersalin — tempelkan ke Muse."; });
+  if (navigator.clipboard) navigator.clipboard.writeText(box.value).then(function(){ document.getElementById("summaryStatus").textContent = "Summary copied — paste it to Muse."; });
 };
 buildSummary();
 </script></body></html>

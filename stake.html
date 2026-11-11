@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BEWORK Staking — Stake NFT, Klaim WORK</title>
+<title>BEWORK Staking — Stake NFTs, Claim WORK</title>
 <style>
   body{background:#0b0e14;color:#e8eaf0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 14px 60px}
   .wrap{max-width:820px;margin:0 auto}
@@ -28,61 +28,61 @@
 <body><div class="wrap">
 
 <h1>BEWORK Staking</h1>
-<p class="sub">Stake NFT BEWORK kamu, kumpulkan WORK setiap jam, dan klaim langsung ke wallet — token terkirim dalam transaksi klaim yang sama, tanpa proses manual.</p>
+<p class="sub">Stake your BEWORK NFTs, earn WORK every hour, and claim straight into your wallet — the tokens arrive in the same claim transaction, with no manual processing.</p>
 
-<div class="card"><h2>Pengaturan kontrak</h2>
-<p>Alamat kontrak staking dan token WORK (diisi sekali dari ringkasan deploy owner, tersimpan di browser ini). Kontrak NFT BEWORK sudah tetap.</p>
-<label>Alamat kontrak staking (BeworkStaking)</label>
-<input id="cfgStaking" placeholder="0x… alamat BeworkStaking">
-<label>Alamat token WORK</label>
-<input id="cfgToken" placeholder="0x… alamat token WORK">
-<label>Kontrak NFT BEWORK (tetap)</label>
+<div class="card"><h2>Contract settings</h2>
+<p>Staking contract and WORK token addresses (paste them once from the owner's deployment summary; they are saved in this browser). The BEWORK NFT contract is fixed.</p>
+<label>Staking contract address (BeworkStaking)</label>
+<input id="cfgStaking" placeholder="0x… BeworkStaking address">
+<label>WORK token address</label>
+<input id="cfgToken" placeholder="0x… WORK token address">
+<label>BEWORK NFT contract (fixed)</label>
 <input id="cfgNft" value="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee" readonly>
-<p><button id="saveCfgBtn" class="alt">Simpan pengaturan</button></p>
+<p><button id="saveCfgBtn" class="alt">Save settings</button></p>
 <p class="status" id="cfgStatus"></p></div>
 
-<div class="card"><h2>01 — Hubungkan wallet</h2>
-<p>Hubungkan wallet pemilik NFT BEWORK. Halaman akan otomatis beralih ke BNB Smart Chain.</p>
-<p><button id="connectBtn">Hubungkan wallet (OKX diutamakan)</button></p>
-<p class="status" id="walletLine">Belum terhubung.</p></div>
+<div class="card"><h2>01 — Connect wallet</h2>
+<p>Connect the wallet that holds your BEWORK NFTs. The page switches to BNB Smart Chain automatically.</p>
+<p><button id="connectBtn">Connect wallet (OKX preferred)</button></p>
+<p class="status" id="walletLine">Not connected.</p></div>
 
-<div class="card"><h2>02 — Panel saya</h2>
+<div class="card"><h2>02 — My panel</h2>
 <div class="grid">
-<div class="cell"><div class="k">Saldo WORK saya</div><div class="v" id="pWorkBal">—</div></div>
-<div class="cell"><div class="k">NFT saya di wallet</div><div class="v" id="pNftBal">—</div></div>
-<div class="cell"><div class="k">NFT sedang di-stake</div><div class="v" id="pStakedCount">—</div></div>
-<div class="cell"><div class="k">Reward bisa diklaim</div><div class="v" id="pPending">—</div></div>
-<div class="cell"><div class="k">Rate reward</div><div class="v" id="pRate">—</div></div>
-<div class="cell"><div class="k">Fee klaim</div><div class="v" id="pFee">—</div></div>
-<div class="cell"><div class="k">Klaim minimum</div><div class="v" id="pMinClaim">—</div></div>
-<div class="cell"><div class="k">Cadangan staking</div><div class="v" id="pReserve">—</div></div>
+<div class="cell"><div class="k">My WORK balance</div><div class="v" id="pWorkBal">—</div></div>
+<div class="cell"><div class="k">NFTs in my wallet</div><div class="v" id="pNftBal">—</div></div>
+<div class="cell"><div class="k">NFTs staked</div><div class="v" id="pStakedCount">—</div></div>
+<div class="cell"><div class="k">Claimable rewards</div><div class="v" id="pPending">—</div></div>
+<div class="cell"><div class="k">Reward rate</div><div class="v" id="pRate">—</div></div>
+<div class="cell"><div class="k">Claim fee</div><div class="v" id="pFee">—</div></div>
+<div class="cell"><div class="k">Minimum claim</div><div class="v" id="pMinClaim">—</div></div>
+<div class="cell"><div class="k">Staking reserve</div><div class="v" id="pReserve">—</div></div>
 </div>
-<p class="small">ID NFT yang sedang kamu stake: <span id="pStakedIds">—</span></p>
-<p><button id="refreshBtn" class="alt">Segarkan panel</button></p>
+<p class="small">Token IDs you currently have staked: <span id="pStakedIds">—</span></p>
+<p><button id="refreshBtn" class="alt">Refresh panel</button></p>
 <p class="status" id="panelStatus"></p></div>
 
-<div class="card"><h2>03 — Stake NFT</h2>
-<p>Pertama kali, setujui kontrak staking untuk memindahkan NFT kamu (sekali saja). Lalu masukkan ID token yang mau di-stake, pisahkan dengan koma — contoh: <code>12, 305, 1999</code>. Pastikan ID itu memang milik wallet kamu.</p>
-<p><button id="approveBtn" class="alt">Setujui staking (setApprovalForAll)</button></p>
+<div class="card"><h2>03 — Stake NFTs</h2>
+<p>First time only: approve the staking contract to move your NFTs (one approval). Then enter the token IDs to stake, separated by commas — e.g. <code>12, 305, 1999</code>. Make sure the IDs belong to this wallet.</p>
+<p><button id="approveBtn" class="alt">Approve staking (setApprovalForAll)</button></p>
 <p class="status" id="approveStatus"></p>
-<label>ID token untuk di-stake</label>
-<input id="stakeIds" placeholder="contoh: 12, 305, 1999">
-<p><button id="stakeBtn">Stake NFT</button></p>
+<label>Token IDs to stake</label>
+<input id="stakeIds" placeholder="e.g. 12, 305, 1999">
+<p><button id="stakeBtn">Stake NFTs</button></p>
 <p class="status" id="stakeStatus"></p></div>
 
-<div class="card"><h2>04 — Unstake NFT</h2>
-<p>Ambil kembali NFT kamu kapan saja — tanpa fee, tidak pernah tertahan. Reward yang sudah terkumpul tetap tercatat dan bisa diklaim setelahnya.</p>
-<label>ID token untuk di-unstake</label>
-<input id="unstakeIds" placeholder="contoh: 12, 305">
-<p><button id="unstakeBtn">Unstake NFT</button></p>
+<div class="card"><h2>04 — Unstake NFTs</h2>
+<p>Take your NFTs back at any time — no fee, never locked. Rewards you already earned stay recorded and can be claimed afterwards.</p>
+<label>Token IDs to unstake</label>
+<input id="unstakeIds" placeholder="e.g. 12, 305">
+<p><button id="unstakeBtn">Unstake NFTs</button></p>
 <p class="status" id="unstakeStatus"></p></div>
 
-<div class="card"><h2>05 — Klaim WORK</h2>
-<p>Klaim mengirim WORK langsung ke wallet kamu dalam transaksi ini juga. Setiap klaim melampirkan fee <b>0,00022 BNB</b> (dibaca langsung dari kontrak) dan butuh reward terkumpul minimal sebesar klaim minimum di panel.</p>
-<p><button id="claimBtn">Klaim WORK</button></p>
+<div class="card"><h2>05 — Claim WORK</h2>
+<p>Claiming sends WORK directly to your wallet in this very transaction. Each claim attaches a fee of <b>0.00022 BNB</b> (read live from the contract) and needs accrued rewards of at least the minimum claim shown in the panel.</p>
+<p><button id="claimBtn">Claim WORK</button></p>
 <p class="status" id="claimStatus"></p></div>
 
-<p class="foot">Staking berjalan lewat kontrak BeworkStaking; kontrak NFT BEWORK tidak diubah. Jaringan: BNB Smart Chain (56).</p>
+<p class="foot">Staking runs through the BeworkStaking contract; the BEWORK NFT contract is unchanged. Network: BNB Smart Chain (56).</p>
 
 </div>
 <script>
@@ -146,36 +146,36 @@ function parseIds(str){
 }
 async function sendTx(to, data, valueHex, statusId){
   var p = provider();
-  if (!p || !account) { document.getElementById(statusId).textContent = "Hubungkan wallet dulu (langkah 01)."; return null; }
+  if (!p || !account) { document.getElementById(statusId).textContent = "Connect your wallet first (step 01)."; return null; }
   try {
     var params = {from: account, to: to, data: data};
     if (valueHex) params.value = valueHex;
     var h = await p.request({method:"eth_sendTransaction", params:[params]});
-    document.getElementById(statusId).textContent = "Transaksi terkirim: " + h + ". Menunggu konfirmasi…";
+    document.getElementById(statusId).textContent = "Transaction sent: " + h + ". Waiting for confirmation…";
     for (var i = 0; i < 40; i++) {
       await new Promise(function(r){ setTimeout(r, 3000); });
       var rc = await p.request({method:"eth_getTransactionReceipt", params:[h]});
       if (rc) {
-        if (rc.status === "0x1") { document.getElementById(statusId).textContent = "Berhasil: " + h; return h; }
-        document.getElementById(statusId).textContent = "Transaksi gagal di chain: " + h;
+        if (rc.status === "0x1") { document.getElementById(statusId).textContent = "Success: " + h; return h; }
+        document.getElementById(statusId).textContent = "Transaction failed on chain: " + h;
         return null;
       }
     }
-    document.getElementById(statusId).textContent = "Transaksi terkirim tapi belum terkonfirmasi setelah 2 menit: " + h;
+    document.getElementById(statusId).textContent = "Transaction sent but not confirmed after 2 minutes: " + h;
     return h;
-  } catch (e) { document.getElementById(statusId).textContent = "Gagal: " + (e && e.message ? e.message : e); return null; }
+  } catch (e) { document.getElementById(statusId).textContent = "Failed: " + (e && e.message ? e.message : e); return null; }
 }
 document.getElementById("saveCfgBtn").onclick = function(){
   var s = stakingAddr(), t = tokenAddr();
-  if (!validAddr(s)) { document.getElementById("cfgStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
-  if (!validAddr(t)) { document.getElementById("cfgStatus").textContent = "Alamat token WORK tidak valid."; return; }
+  if (!validAddr(s)) { document.getElementById("cfgStatus").textContent = "Invalid staking contract address."; return; }
+  if (!validAddr(t)) { document.getElementById("cfgStatus").textContent = "Invalid WORK token address."; return; }
   try { localStorage.setItem("bework_staking", s); localStorage.setItem("bework_token", t); } catch (e) {}
-  document.getElementById("cfgStatus").textContent = "Pengaturan tersimpan.";
+  document.getElementById("cfgStatus").textContent = "Settings saved.";
   refreshPanel();
 };
 document.getElementById("connectBtn").onclick = async function(){
   var p = provider();
-  if (!p) { document.getElementById("walletLine").textContent = "Wallet tidak ditemukan — buka halaman ini di dApp browser OKX / MetaMask / Trust."; return; }
+  if (!p) { document.getElementById("walletLine").textContent = "No wallet found — open this page in the OKX / MetaMask / Trust dApp browser."; return; }
   try {
     var accs = await p.request({method:"eth_requestAccounts"});
     account = accs[0];
@@ -184,22 +184,22 @@ document.getElementById("connectBtn").onclick = async function(){
       if (e && e.code === 4902) { await p.request({method:"wallet_addEthereumChain", params:[{chainId:"0x38", chainName:"BNB Smart Chain", nativeCurrency:{name:"BNB", symbol:"BNB", decimals:18}, rpcUrls:["https://bsc-dataseed.binance.org/"], blockExplorerUrls:["https://bscscan.com"]}]}); }
       else throw e;
     }
-    document.getElementById("walletLine").textContent = "Terhubung: " + account;
+    document.getElementById("walletLine").textContent = "Connected: " + account;
     refreshPanel();
-  } catch (e) { document.getElementById("walletLine").textContent = "Koneksi gagal: " + (e && e.message ? e.message : e); }
+  } catch (e) { document.getElementById("walletLine").textContent = "Connection failed: " + (e && e.message ? e.message : e); }
 };
 async function refreshPanel(){
   var s = stakingAddr(), t = tokenAddr();
-  if (!validAddr(s) || !validAddr(t)) { document.getElementById("panelStatus").textContent = "Isi dan simpan alamat kontrak staking + token dulu."; return; }
+  if (!validAddr(s) || !validAddr(t)) { document.getElementById("panelStatus").textContent = "Fill in and save the staking + token contract addresses first."; return; }
   var p = provider();
-  if (!p) { document.getElementById("panelStatus").textContent = "Wallet tidak ditemukan."; return; }
+  if (!p) { document.getElementById("panelStatus").textContent = "No wallet found."; return; }
   try {
     var rate = BigInt(await callRead(s, SEL_RATE));
     var fee = BigInt(await callRead(s, SEL_FEE));
     var minC = BigInt(await callRead(s, SEL_MINCLAIM));
     var reserve = BigInt(await callRead(s, SEL_RESERVE));
-    document.getElementById("pRate").textContent = fmtWork(rate) + " / jam / NFT";
-    document.getElementById("pFee").textContent = fmtBnb(fee) + " / klaim";
+    document.getElementById("pRate").textContent = fmtWork(rate) + " / hour / NFT";
+    document.getElementById("pFee").textContent = fmtBnb(fee) + " / claim";
     document.getElementById("pMinClaim").textContent = fmtWork(minC);
     document.getElementById("pReserve").textContent = fmtWork(reserve);
     if (account) {
@@ -211,60 +211,60 @@ async function refreshPanel(){
       document.getElementById("pNftBal").textContent = nbal.toString() + " NFT";
       document.getElementById("pStakedCount").textContent = ids.length.toString() + " NFT";
       document.getElementById("pPending").textContent = fmtWork(pend);
-      document.getElementById("pStakedIds").textContent = ids.length ? ids.map(function(x){ return x.toString(); }).join(", ") : "(tidak ada)";
+      document.getElementById("pStakedIds").textContent = ids.length ? ids.map(function(x){ return x.toString(); }).join(", ") : "(none)";
     }
-    document.getElementById("panelStatus").textContent = "Panel disegarkan dari chain.";
-  } catch (e) { document.getElementById("panelStatus").textContent = "Gagal membaca: " + e.message + " (pastikan alamat kontrak benar)."; }
+    document.getElementById("panelStatus").textContent = "Panel refreshed from chain.";
+  } catch (e) { document.getElementById("panelStatus").textContent = "Read failed: " + e.message + " (check the contract addresses)."; }
 }
 document.getElementById("refreshBtn").onclick = refreshPanel;
 document.getElementById("approveBtn").onclick = async function(){
   var s = stakingAddr();
-  if (!validAddr(s)) { document.getElementById("approveStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
-  if (!account) { document.getElementById("approveStatus").textContent = "Hubungkan wallet dulu."; return; }
+  if (!validAddr(s)) { document.getElementById("approveStatus").textContent = "Invalid staking contract address."; return; }
+  if (!account) { document.getElementById("approveStatus").textContent = "Connect your wallet first."; return; }
   try {
     var already = await callRead(NFT_DEFAULT, SEL_ISAPPROVED + encodeAddr(account) + encodeAddr(s));
-    if (BigInt(already) === BigInt(1)) { document.getElementById("approveStatus").textContent = "Sudah disetujui sebelumnya — tidak perlu approve lagi."; return; }
+    if (BigInt(already) === BigInt(1)) { document.getElementById("approveStatus").textContent = "Already approved — no need to approve again."; return; }
   } catch (e) {}
   var h = await sendTx(NFT_DEFAULT, SEL_SETAPPROVAL + encodeAddr(s) + encodeUint(1), null, "approveStatus");
-  if (h) document.getElementById("approveStatus").textContent = "Persetujuan aktif: " + h;
+  if (h) document.getElementById("approveStatus").textContent = "Approval active: " + h;
 };
 document.getElementById("stakeBtn").onclick = async function(){
   var s = stakingAddr();
-  if (!validAddr(s)) { document.getElementById("stakeStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
+  if (!validAddr(s)) { document.getElementById("stakeStatus").textContent = "Invalid staking contract address."; return; }
   var ids = parseIds(document.getElementById("stakeIds").value);
-  if (!ids) { document.getElementById("stakeStatus").textContent = "ID tidak valid — isi angka ID token, pisahkan koma."; return; }
+  if (!ids) { document.getElementById("stakeStatus").textContent = "Invalid IDs — enter token ID numbers separated by commas."; return; }
   for (var i = 0; i < ids.length; i++) {
     try {
       var ow = await callRead(NFT_DEFAULT, SEL_OWNEROF + encodeUint(ids[i]));
       if (ow.toLowerCase().indexOf(account.toLowerCase().replace("0x", "")) === -1) {
-        document.getElementById("stakeStatus").textContent = "Token " + ids[i].toString() + " bukan milik wallet ini.";
+        document.getElementById("stakeStatus").textContent = "Token " + ids[i].toString() + " does not belong to this wallet.";
         return;
       }
-    } catch (e) { document.getElementById("stakeStatus").textContent = "Tidak bisa memeriksa pemilik token " + ids[i].toString() + ": " + e.message; return; }
+    } catch (e) { document.getElementById("stakeStatus").textContent = "Could not verify the owner of token " + ids[i].toString() + ": " + e.message; return; }
   }
   var h = await sendTx(s, SEL_STAKE + encodeIdArray(ids), null, "stakeStatus");
   if (h) refreshPanel();
 };
 document.getElementById("unstakeBtn").onclick = async function(){
   var s = stakingAddr();
-  if (!validAddr(s)) { document.getElementById("unstakeStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
+  if (!validAddr(s)) { document.getElementById("unstakeStatus").textContent = "Invalid staking contract address."; return; }
   var ids = parseIds(document.getElementById("unstakeIds").value);
-  if (!ids) { document.getElementById("unstakeStatus").textContent = "ID tidak valid — isi angka ID token, pisahkan koma."; return; }
+  if (!ids) { document.getElementById("unstakeStatus").textContent = "Invalid IDs — enter token ID numbers separated by commas."; return; }
   var h = await sendTx(s, SEL_UNSTAKE + encodeIdArray(ids), null, "unstakeStatus");
   if (h) refreshPanel();
 };
 document.getElementById("claimBtn").onclick = async function(){
   var s = stakingAddr();
-  if (!validAddr(s)) { document.getElementById("claimStatus").textContent = "Alamat kontrak staking tidak valid."; return; }
+  if (!validAddr(s)) { document.getElementById("claimStatus").textContent = "Invalid staking contract address."; return; }
   try {
     var fee = BigInt(await callRead(s, SEL_FEE));
     var minC = BigInt(await callRead(s, SEL_MINCLAIM));
     var pend = BigInt(await callRead(s, SEL_PENDING + encodeAddr(account)));
-    if (pend < minC) { document.getElementById("claimStatus").textContent = "Reward terkumpul " + fmtWork(pend) + " — belum mencapai klaim minimum " + fmtWork(minC) + "."; return; }
+    if (pend < minC) { document.getElementById("claimStatus").textContent = "Accrued rewards " + fmtWork(pend) + " — below the minimum claim of " + fmtWork(minC) + "."; return; }
     var valueHex = "0x" + fee.toString(16);
     var h = await sendTx(s, SEL_CLAIM, valueHex, "claimStatus");
-    if (h) { document.getElementById("claimStatus").textContent = "WORK terkirim ke wallet kamu: " + h; refreshPanel(); }
-  } catch (e) { document.getElementById("claimStatus").textContent = "Gagal: " + (e && e.message ? e.message : e); }
+    if (h) { document.getElementById("claimStatus").textContent = "WORK sent to your wallet: " + h; refreshPanel(); }
+  } catch (e) { document.getElementById("claimStatus").textContent = "Failed: " + (e && e.message ? e.message : e); }
 };
 try {
   var sv = localStorage.getItem("bework_staking");
