@@ -2,51 +2,66 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEWORK Staking — Stake NFTs, Claim WORK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-  body{background:#0b0e14;color:#e8eaf0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px 14px 60px}
-  .wrap{max-width:820px;margin:0 auto}
-  h1{font-size:24px;margin:0 0 4px}
-  .sub{color:#9aa3b5;font-size:14px;margin:0 0 18px}
-  .card{background:#12161f;border:1px solid #232a38;border-radius:14px;padding:18px;margin:14px 0}
-  .card h2{font-size:17px;margin:0 0 10px;color:#f5c542}
-  .card p{font-size:14px;line-height:1.55;color:#c6ccd9}
-  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:#ffd97a;word-break:break-all}
-  label{display:block;font-size:13px;color:#9aa3b5;margin:12px 0 5px}
-  input{width:100%;box-sizing:border-box;background:#0b0e14;border:1px solid #2b3446;border-radius:9px;color:#e8eaf0;padding:10px 12px;font-size:14px;font-family:ui-monospace,Menlo,Consolas,monospace}
-  button{background:#f5c542;color:#14100a;border:0;border-radius:9px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;margin:10px 8px 4px 0}
-  button.alt{background:#232a38;color:#e8eaf0}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  button:hover{filter:brightness(1.08)}
-  .small{font-size:13px;color:#9aa3b5;line-height:1.5}
-  .status{font-size:13.5px;color:#a7f3c9;min-height:18px;word-break:break-all}
+  :root{--bg:#070a1a;--panel:#0d1330;--cy:#22e6f2;--or:#ff8a1f;--pu:#b35cff;--tx:#e8ecff;--mu:#8a93b8;color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--tx);font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:14px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #1b2350}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Pixelify Sans",monospace;font-weight:700;font-size:20px;letter-spacing:.04em;color:#9aa6d8}
+  .brand .pxlogo{width:34px;height:34px;border:2px solid #1d6f78;background:#0d1330;box-shadow:inset 0 0 0 4px #0d1330,inset 0 0 0 6px var(--cy)}
+  h1{font-family:"Pixelify Sans",monospace;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1.05;margin:30px 0 0}
+  h1 .hl{color:var(--cy)}
+  .sub{color:var(--mu);line-height:1.6;max-width:62ch;margin:12px 0 22px}
+  .box{border:3px solid #2a3470;background:#14123a;padding:20px;box-shadow:6px 6px 0 #000;margin:0 0 26px}
+  .box h2{font-family:"Pixelify Sans",monospace;color:#ffd23f;font-size:21px;letter-spacing:.12em;margin:0 0 10px}
+  .box p{color:var(--mu);line-height:1.6;margin:0 0 14px}
+  code{font-family:inherit;font-size:12.5px;color:#ffd23f;word-break:break-all}
+  label{display:block;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
+  input{width:100%;box-sizing:border-box;background:var(--panel);border:2px solid #2a3470;color:var(--tx);padding:9px 10px;font-size:13.5px;font-family:inherit;min-width:0}
+  input[readonly]{color:var(--mu)}
+  input:focus-visible{outline:3px solid var(--pu);outline-offset:2px}
+  .btn{display:inline-block;font-family:"Pixelify Sans",monospace;font-weight:700;font-size:16px;letter-spacing:.06em;color:var(--cy);background:var(--panel);border:3px solid var(--cy);padding:9px 16px;cursor:pointer;box-shadow:4px 4px 0 var(--or);transition:transform .08s,box-shadow .08s;text-decoration:none;margin:8px 8px 4px 0}
+  .btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--or)}
+  .btn:focus-visible{outline:3px solid var(--pu);outline-offset:2px}
+  .btn.alt{color:var(--tx);border-color:#2a3470;box-shadow:4px 4px 0 #000}
+  .btn.alt:hover{box-shadow:2px 2px 0 #000}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .small{font-size:12.5px;color:var(--mu);line-height:1.6}
+  .status{font-size:13.5px;color:#39ffb0;min-height:18px;word-break:break-all;margin-top:10px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
-  .cell{background:#0b0e14;border:1px solid #232a38;border-radius:10px;padding:10px 12px}
-  .cell .k{font-size:11.5px;color:#9aa3b5;letter-spacing:.04em}
-  .cell .v{font-size:15px;font-weight:700;margin-top:3px;word-break:break-all}
-  .foot{font-size:12.5px;color:#77808f;line-height:1.6;margin-top:18px}
+  .cell{background:#0a0920;border:2px solid #2a3470;padding:10px 12px}
+  .cell .k{font-size:11px;color:var(--mu);letter-spacing:.05em;text-transform:uppercase}
+  .cell .v{font-family:"Pixelify Sans",monospace;font-size:16.5px;font-weight:700;color:var(--cy);margin-top:4px;word-break:break-all}
+  footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-size:12px;line-height:1.7}
 </style></head>
 <body><div class="wrap">
+<header>
+  <div class="brand"><span class="pxlogo"></span>BEWORK</div>
+  <a class="btn" href="index.html">&larr; MINT</a>
+</header>
 
-<h1>BEWORK Staking</h1>
+<h1>BEWORK <span class="hl">STAKING</span></h1>
 <p class="sub">Stake your BEWORK NFTs, earn WORK every hour, and claim straight into your wallet — the tokens arrive in the same claim transaction, with no manual processing.</p>
 
-<div class="card"><h2>Contract settings</h2>
-<p>Staking contract and WORK token addresses (paste them once from the owner's deployment summary; they are saved in this browser). The BEWORK NFT contract is fixed.</p>
+<div class="box"><h2>CONTRACT SETTINGS</h2>
+<p>The staking and token addresses below are pre-filled from the official deployment — normally you never need to touch them. If you change them, the new values are saved in this browser. The BEWORK NFT contract is fixed.</p>
 <label>Staking contract address (BeworkStaking)</label>
-<input id="cfgStaking" placeholder="0x… BeworkStaking address">
+<input id="cfgStaking" value="0x61063e84831cb4a92a309b12661e1f70e2fbc339">
 <label>WORK token address</label>
-<input id="cfgToken" placeholder="0x… WORK token address">
+<input id="cfgToken" value="0x87f16afc6219e59e0ff2dd59653d98def41a629c">
 <label>BEWORK NFT contract (fixed)</label>
 <input id="cfgNft" value="0x78eDD42101e889cC3Ce4B24CBb0Fc774082BcAee" readonly>
-<p><button id="saveCfgBtn" class="alt">Save settings</button></p>
+<p style="margin-top:14px"><button id="saveCfgBtn" class="btn alt">SAVE SETTINGS</button></p>
 <p class="status" id="cfgStatus"></p></div>
 
-<div class="card"><h2>01 — Connect wallet</h2>
+<div class="box"><h2>01 — CONNECT WALLET</h2>
 <p>Connect the wallet that holds your BEWORK NFTs. The page switches to BNB Smart Chain automatically.</p>
-<p><button id="connectBtn">Connect wallet (OKX preferred)</button></p>
+<p><button id="connectBtn" class="btn">CONNECT WALLET</button></p>
 <p class="status" id="walletLine">Not connected.</p></div>
 
-<div class="card"><h2>02 — My panel</h2>
+<div class="box"><h2>02 — MY PANEL</h2>
 <div class="grid">
 <div class="cell"><div class="k">My WORK balance</div><div class="v" id="pWorkBal">—</div></div>
 <div class="cell"><div class="k">NFTs in my wallet</div><div class="v" id="pNftBal">—</div></div>
@@ -58,31 +73,31 @@
 <div class="cell"><div class="k">Staking reserve</div><div class="v" id="pReserve">—</div></div>
 </div>
 <p class="small">Token IDs you currently have staked: <span id="pStakedIds">—</span></p>
-<p><button id="refreshBtn" class="alt">Refresh panel</button></p>
+<p><button id="refreshBtn" class="btn alt">REFRESH PANEL</button></p>
 <p class="status" id="panelStatus"></p></div>
 
-<div class="card"><h2>03 — Stake NFTs</h2>
+<div class="box"><h2>03 — STAKE NFTS</h2>
 <p>First time only: approve the staking contract to move your NFTs (one approval). Then enter the token IDs to stake, separated by commas — e.g. <code>12, 305, 1999</code>. Make sure the IDs belong to this wallet.</p>
-<p><button id="approveBtn" class="alt">Approve staking (setApprovalForAll)</button></p>
+<p><button id="approveBtn" class="btn alt">APPROVE STAKING</button></p>
 <p class="status" id="approveStatus"></p>
 <label>Token IDs to stake</label>
 <input id="stakeIds" placeholder="e.g. 12, 305, 1999">
-<p><button id="stakeBtn">Stake NFTs</button></p>
+<p><button id="stakeBtn" class="btn">STAKE NFTS</button></p>
 <p class="status" id="stakeStatus"></p></div>
 
-<div class="card"><h2>04 — Unstake NFTs</h2>
+<div class="box"><h2>04 — UNSTAKE NFTS</h2>
 <p>Take your NFTs back at any time — no fee, never locked. Rewards you already earned stay recorded and can be claimed afterwards.</p>
 <label>Token IDs to unstake</label>
 <input id="unstakeIds" placeholder="e.g. 12, 305">
-<p><button id="unstakeBtn">Unstake NFTs</button></p>
+<p><button id="unstakeBtn" class="btn">UNSTAKE NFTS</button></p>
 <p class="status" id="unstakeStatus"></p></div>
 
-<div class="card"><h2>05 — Claim WORK</h2>
-<p>Claiming sends WORK directly to your wallet in this very transaction. Each claim attaches a fee of <b>0.00022 BNB</b> (read live from the contract) and needs accrued rewards of at least the minimum claim shown in the panel.</p>
-<p><button id="claimBtn">Claim WORK</button></p>
+<div class="box"><h2>05 — CLAIM WORK</h2>
+<p>Claiming sends WORK directly to your wallet in this very transaction. Each claim attaches a fee of <b style="color:var(--tx)">0.00022 BNB</b> (read live from the contract) and needs accrued rewards of at least the minimum claim shown in the panel.</p>
+<p><button id="claimBtn" class="btn">CLAIM WORK</button></p>
 <p class="status" id="claimStatus"></p></div>
 
-<p class="foot">Staking runs through the BeworkStaking contract; the BEWORK NFT contract is unchanged. Network: BNB Smart Chain (56).</p>
+<footer>Staking runs through the BeworkStaking contract; the BEWORK NFT contract is unchanged.<br>Network: BNB Smart Chain (56) · Staking: 0x6106…c339 · WORK: 0x87f1…629c</footer>
 
 </div>
 <script>
