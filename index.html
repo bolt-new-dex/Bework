@@ -318,5 +318,108 @@ skBuildPrompt();
 })();
 </script>
 <script>(function(){var STK="0x61063e84831cb4a92a309b12661e1f70e2fbc339",RPCS=["https://bsc-dataseed.binance.org/","https://bsc-rpc.publicnode.com","https://bsc-dataseed1.defibit.io"],FUNDED=500000000n*10n**18n;function fmt(w){return (w/10n**18n).toLocaleString("en-US")+" WORK"}async function call(d){for(var i=0;i<RPCS.length;i++){try{var r=await fetch(RPCS[i],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to:STK,data:d},"latest"]})});var j=await r.json();if(j&&j.result)return BigInt(j.result)}catch(e){}}return null}async function load(){var t=await call("0x817b1cd2");if(t!==null)document.getElementById("pbStaked").textContent=t.toLocaleString("en-US");var res=await call("0xa10954fe");if(res!==null){document.getElementById("pbReserve").textContent=fmt(res);var cl=FUNDED-res;if(cl<0n)cl=0n;document.getElementById("pbClaimed").textContent=fmt(cl)}}load();setInterval(load,60000)})();</script>
+<style>
+#skClaim.axReady{animation:axPulse 1.6s ease-in-out infinite}
+@keyframes axPulse{0%,100%{box-shadow:0 0 0 0 rgba(57,255,176,0)}50%{box-shadow:0 0 20px 3px rgba(57,255,176,.55)}}
+.axPop{display:inline-block;animation:axPop .5s ease}
+@keyframes axPop{0%{transform:scale(1.22);color:#39ffb0}100%{transform:scale(1)}}
+.axFloat{position:absolute;z-index:60;font-family:'Pixelify Sans',monospace;font-size:22px;color:#39ffb0;pointer-events:none;text-shadow:2px 2px 0 #070a1a;animation:axFloatUp 1.6s ease-out forwards}
+@keyframes axFloatUp{0%{opacity:0;transform:translateY(8px)}15%{opacity:1}100%{opacity:0;transform:translateY(-64px)}}
+@media (prefers-reduced-motion: reduce){#skClaim.axReady,.axPop,.axFloat{animation:none}}
+</style>
+<script>
+(function(){
+"use strict";
+var PALETTE=["#22e6f2","#ff8a1f","#39ffb0","#b35cff","#e8ecff"];
+var reduced=false;
+try{reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+function $(id){return document.getElementById(id)}
+function parseNum(t){if(!t)return null;var m=String(t).replace(/,/g,"").match(/-?\d+(\.\d+)?/);return m?parseFloat(m[0]):null}
+function decimalsOf(t){var m=String(t).match(/\.(\d+)/);return m?m[1].length:0}
+function fmtLike(v,like){var d=decimalsOf(like);if(d>6)d=6;var s=v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});return /WORK/.test(like)?s+" WORK":s}
+/* ---------- pixel coin burst ---------- */
+var cvs=null,ctx=null,parts=[],rafId=null;
+function ensureCanvas(){if(cvs)return;cvs=document.createElement("canvas");cvs.id="axCanvas";cvs.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999";document.body.appendChild(cvs);ctx=cvs.getContext("2d");sizeCanvas();window.addEventListener("resize",sizeCanvas)}
+function sizeCanvas(){if(!cvs)return;cvs.width=window.innerWidth;cvs.height=window.innerHeight}
+function burst(el,colors){
+  if(reduced||!el)return;ensureCanvas();
+  var r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(var i=0;i<90;i++){var a=Math.random()*Math.PI*2,sp=2+Math.random()*7;
+    parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3.5,g:0.16+Math.random()*0.08,s:3+Math.floor(Math.random()*6),c:colors[i%colors.length],life:1,decay:0.008+Math.random()*0.01});}
+  if(!rafId)tick();
+}
+function tick(){
+  rafId=requestAnimationFrame(tick);
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  parts=parts.filter(function(p){return p.life>0});
+  if(!parts.length){cancelAnimationFrame(rafId);rafId=null;ctx.clearRect(0,0,cvs.width,cvs.height);return}
+  for(var i=0;i<parts.length;i++){var p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.life-=p.decay;
+    ctx.globalAlpha=Math.max(p.life,0);ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.s,p.s);}
+  ctx.globalAlpha=1;
+}
+function floatText(el,text){
+  if(reduced||!el)return;
+  var host=el.parentElement;if(!host)return;
+  if(getComputedStyle(host).position==="static")host.style.position="relative";
+  var d=document.createElement("div");d.className="axFloat";d.textContent=text;
+  d.style.left=(el.offsetLeft+el.offsetWidth/2-40)+"px";d.style.top=(el.offsetTop-8)+"px";
+  host.appendChild(d);setTimeout(function(){d.remove()},1700);
+}
+/* ---------- success watchers: bursts for claim / stake / unstake / approve ---------- */
+function isSuccess(t){return /0x[0-9a-fA-F]{10,}/.test(t)||/success|claimed|staked|approved|done/i.test(t)}
+function watch(statusId,btnId,colors,isClaim){
+  var s=$(statusId),b=$(btnId);if(!s)return;
+  var prev=s.textContent;
+  new MutationObserver(function(){
+    var t=s.textContent;
+    if(t&&t!==prev){prev=t;
+      if(isSuccess(t)){burst(b,colors);
+        if(isClaim){var m=t.replace(/,/g,"").match(/([\d]+(?:\.\d+)?)\s*WORK/i);floatText(b,m?("+"+m[1]+" WORK"):"+ WORK CLAIMED");}}
+    }
+  }).observe(s,{childList:true,characterData:true,subtree:true});
+}
+watch("skClaimStatus","skClaim",["#39ffb0","#22e6f2","#e8ecff"],true);
+watch("skStakeStatus","skStake",["#ff8a1f","#b35cff","#22e6f2"],false);
+watch("skUnstakeStatus","skUnstake",["#b35cff","#22e6f2","#e8ecff"],false);
+watch("skApproveStatus","skApprove",["#22e6f2","#e8ecff"],false);
+/* ---------- count-up + pop for public stats ---------- */
+function tween(el,targetText){
+  var to=parseNum(targetText);if(to===null||reduced){return}
+  var from=parseNum(el.dataset.axVal||"");
+  el.dataset.axVal=String(to);
+  if(from===null||from===to){pop(el);return}
+  var start=null,dur=800;
+  function step(ts){if(!start)start=ts;var k=Math.min((ts-start)/dur,1),e=1-Math.pow(1-k,3);
+    el.textContent=fmtLike(from+(to-from)*e,targetText);
+    if(k<1)requestAnimationFrame(step);else el.textContent=targetText;}
+  requestAnimationFrame(step);pop(el);
+}
+function pop(el){el.classList.remove("axPop");void el.offsetWidth;el.classList.add("axPop")}
+["pbStaked","pbClaimed","pbReserve","skTotalStaked"].forEach(function(id){
+  var el=$(id);if(!el)return;
+  var prev=el.textContent;
+  new MutationObserver(function(){var t=el.textContent;if(t!==prev){prev=t;tween(el,t)}}).observe(el,{childList:true,characterData:true,subtree:true});
+});
+/* ---------- live earnings ticker + claim-ready glow ---------- */
+setInterval(function(){
+  try{
+    if(document.hidden)return;
+    var cntEl=$("skStakedCount"),rateEl=$("skRate"),pendEl=$("skPending"),minEl=$("skMin"),claimBtn=$("skClaim");
+    if(!pendEl)return;
+    var pend=parseNum(pendEl.textContent);
+    if(pend!==null&&minEl&&claimBtn){var mn=parseNum(minEl.textContent);
+      if(mn!==null&&mn>0&&pend>=mn)claimBtn.classList.add("axReady");else claimBtn.classList.remove("axReady");}
+    if(reduced)return;
+    if(!cntEl||!rateEl)return;
+    var cnt=parseNum(cntEl.textContent),rate=parseNum(rateEl.textContent);
+    if(cnt===null||rate===null||pend===null||cnt<=0||rate<=0)return;
+    if(/—|–/.test(pendEl.textContent))return;
+    var nv=pend+rate*cnt/3600;
+    pendEl.textContent=fmtLike(nv,pendEl.textContent);
+  }catch(e){}
+},1000);
+})();
+
+</script>
 </body>
 </html>
