@@ -117,6 +117,7 @@ footer{border-top:1px solid #1b2350;color:var(--mu);padding:20px 0 30px;font-siz
 <div class="box" id="staking" style="margin-top:26px"><h2>STAKE &amp; CLAIM WORK</h2>
 <p>Your BEWORK NPCs can work for you. Stake them and earn <b style="color:var(--tx)">10 WORK per hour</b> for every staked NFT — rewards build up from the moment you stake. Claiming sends WORK straight to your wallet in the same transaction: no queues, no manual payouts. Claim fee is 0.00022 BNB, minimum claim 10 WORK, and unstaking is free any time — your NPCs are never locked.</p>
 <div style="display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 4px"><span class="chip">10 WORK / hour / NFT</span><span class="chip">500,000,000 WORK reserve funded</span><span class="chip">Claim fee 0.00022 BNB</span></div>
+<div class="stats" style="margin-top:18px"><div><b id="pbStaked">&mdash;</b><span>NPCs staked (everyone)</span></div><div><b id="pbClaimed">&mdash;</b><span>WORK claimed by stakers</span></div><div><b id="pbReserve">&mdash;</b><span>Reward reserve left</span></div></div>
 <div class="stats" style="margin-top:18px"><div><b id="skPending">—</b><span>Claimable WORK</span></div><div><b id="skStakedCount">—</b><span>Your staked NFTs</span></div><div><b id="skWorkBal">—</b><span>Your WORK balance</span></div><div><b id="skReserve">—</b><span>Staking reserve</span></div></div>
 <button class="btn" id="skClaim" style="font-size:19px;padding:12px 22px">CLAIM WORK</button>
 <p id="skClaimStatus" style="margin-top:12px;color:#39ffb0;word-break:break-word;min-height:18px"></p>
@@ -316,5 +317,6 @@ skBuildPrompt();
 (async function(){var p=skProvider();if(!p)return;try{var a=await p.request({method:"eth_accounts"});if(a&&a.length){skAccount=a[0];skBuildPrompt()}}catch(e){}skRefresh()})();
 })();
 </script>
+<script>(function(){var STK="0x61063e84831cb4a92a309b12661e1f70e2fbc339",RPCS=["https://bsc-dataseed.binance.org/","https://bsc-rpc.publicnode.com","https://bsc-dataseed1.defibit.io"],FUNDED=500000000n*10n**18n;function fmt(w){return (w/10n**18n).toLocaleString("en-US")+" WORK"}async function call(d){for(var i=0;i<RPCS.length;i++){try{var r=await fetch(RPCS[i],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to:STK,data:d},"latest"]})});var j=await r.json();if(j&&j.result)return BigInt(j.result)}catch(e){}}return null}async function load(){var t=await call("0x817b1cd2");if(t!==null)document.getElementById("pbStaked").textContent=t.toLocaleString("en-US");var res=await call("0xa10954fe");if(res!==null){document.getElementById("pbReserve").textContent=fmt(res);var cl=FUNDED-res;if(cl<0n)cl=0n;document.getElementById("pbClaimed").textContent=fmt(cl)}}load();setInterval(load,60000)})();</script>
 </body>
 </html>
